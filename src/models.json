@@ -1,0 +1,395 @@
+{
+    "adjBasic": {
+        "sortf": 0,
+        "did": 1,
+        "latexPre": "\\documentclass[12pt]{article}\n\\special{papersize=3in,5in}\n\\usepackage[utf8]{inputenc}\n\\usepackage{amssymb,amsmath}\n\\pagestyle{empty}\n\\setlength{\\parindent}{0in}\n\\begin{document}\n",
+        "latexPost": "\\end{document}",
+        "mod": 1568390094,
+        "usn": -1,
+        "vers": [],
+        "type": 0,
+        "css": ".card {\n font-family: arial;\n font-size: 20px;\n text-align: center;\n color: black;\n background-color: white;\n}\n",
+        "name": "Basic (with pdf references)",
+        "flds": [
+            {
+                "name": "Front",
+                "ord": 0,
+                "sticky": false,
+                "rtl": false,
+                "font": "Arial",
+                "size": 20,
+                "media": []
+            },
+            {
+                "name": "Back",
+                "ord": 1,
+                "sticky": false,
+                "rtl": false,
+                "font": "Arial",
+                "size": 20,
+                "media": []
+            },
+            {
+                "name": "external_source",
+                "ord": 2,
+                "sticky": false,
+                "rtl": false,
+                "font": "Arial",
+                "size": 20,
+                "media": []
+            },
+            {
+                "name": "external_page",
+                "ord": 3,
+                "sticky": false,
+                "rtl": false,
+                "font": "Arial",
+                "size": 20,
+                "media": []
+            }
+        ],
+        "tmpls": [
+            {
+                "name": "Card 1",
+                "ord": 0,
+                "qfmt": "{{Front}}",
+                "afmt": "{{FrontSide}}\n\n<hr id=answer>\n\n{{Back}}\n<br><br><br><a href='javascript:pycmd(\"pdfjs319501851{{text:external_source}}319501851{{text:external_page}}\");'>{{external_source}}</a>",
+                "did": null,
+                "bqfmt": "",
+                "bafmt": ""
+            }
+        ],
+        "tags": [],
+        "id": "1568390094753",
+        "req": [
+            [
+                0,
+                "all",
+                [
+                    0
+                ]
+            ]
+        ]
+    },
+    "adjCloze": {
+        "sortf": 0,
+        "did": 1,
+        "latexPre": "\\documentclass[12pt]{article}\n\\special{papersize=3in,5in}\n\\usepackage[utf8]{inputenc}\n\\usepackage{amssymb,amsmath}\n\\pagestyle{empty}\n\\setlength{\\parindent}{0in}\n\\begin{document}\n",
+        "latexPost": "\\end{document}",
+        "mod": 1568390094,
+        "usn": -1,
+        "vers": [],
+        "type": 1,
+        "css": ".card {\n font-family: arial;\n font-size: 20px;\n text-align: center;\n color: black;\n background-color: white;\n}\n\n.cloze {\n font-weight: bold;\n color: blue;\n}\n.nightMode .cloze {\n color: lightblue;\n}",
+        "name": "Cloze (with pdf references)",
+        "flds": [
+            {
+                "name": "Text",
+                "ord": 0,
+                "sticky": false,
+                "rtl": false,
+                "font": "Arial",
+                "size": 20,
+                "media": []
+            },
+            {
+                "name": "Extra",
+                "ord": 1,
+                "sticky": false,
+                "rtl": false,
+                "font": "Arial",
+                "size": 20,
+                "media": []
+            },
+            {
+                "name": "external_source",
+                "ord": 2,
+                "sticky": false,
+                "rtl": false,
+                "font": "Arial",
+                "size": 20,
+                "media": []
+            },
+            {
+                "name": "external_page",
+                "ord": 3,
+                "sticky": false,
+                "rtl": false,
+                "font": "Arial",
+                "size": 20,
+                "media": []
+            }
+        ],
+        "tmpls": [
+            {
+                "name": "Cloze",
+                "ord": 0,
+                "qfmt": "{{cloze:Text}}",
+                "afmt": "{{cloze:Text}}<br>\n{{Extra}}\n<br><br><br><a href='javascript:pycmd(\"pdfjs319501851{{text:external_source}}319501851{{text:external_page}}\");'>{{external_source}}</a>",
+                "did": null,
+                "bqfmt": "",
+                "bafmt": ""
+            }
+        ],
+        "tags": [],
+        "id": "1568390094743"
+    },
+    "adjBasicTypeIn": {
+        "sortf": 0,
+        "did": 1,
+        "latexPre": "\\documentclass[12pt]{article}\n\\special{papersize=3in,5in}\n\\usepackage[utf8]{inputenc}\n\\usepackage{amssymb,amsmath}\n\\pagestyle{empty}\n\\setlength{\\parindent}{0in}\n\\begin{document}\n",
+        "latexPost": "\\end{document}",
+        "mod": 1568390094,
+        "usn": -1,
+        "vers": [],
+        "type": 0,
+        "css": ".card {\n font-family: arial;\n font-size: 20px;\n text-align: center;\n color: black;\n background-color: white;\n}\n",
+        "name": "Basic (type in the answer, with pdf references)",
+        "flds": [
+            {
+                "name": "Front",
+                "ord": 0,
+                "sticky": false,
+                "rtl": false,
+                "font": "Arial",
+                "size": 20,
+                "media": []
+            },
+            {
+                "name": "Back",
+                "ord": 1,
+                "sticky": false,
+                "rtl": false,
+                "font": "Arial",
+                "size": 20,
+                "media": []
+            },
+            {
+                "name": "external_source",
+                "ord": 2,
+                "sticky": false,
+                "rtl": false,
+                "font": "Arial",
+                "size": 20,
+                "media": []
+            },
+            {
+                "name": "external_page",
+                "ord": 3,
+                "sticky": false,
+                "rtl": false,
+                "font": "Arial",
+                "size": 20,
+                "media": []
+            }
+        ],
+        "tmpls": [
+            {
+                "name": "Card 1",
+                "ord": 0,
+                "qfmt": "{{Front}}\n\n{{type:Back}}",
+                "afmt": "{{Front}}\n\n<hr id=answer>\n\n{{type:Back}}\n<br><br><br><a href='javascript:pycmd(\"pdfjs319501851{{text:external_source}}319501851{{text:external_page}}\");'>{{external_source}}</a>",
+                "did": null,
+                "bqfmt": "",
+                "bafmt": ""
+            }
+        ],
+        "tags": [],
+        "id": "1568390094744",
+        "req": [
+            [
+                0,
+                "all",
+                [
+                    0
+                ]
+            ]
+        ]
+    },
+    "adjBasicOptReverse": {
+        "sortf": 0,
+        "did": 1,
+        "latexPre": "\\documentclass[12pt]{article}\n\\special{papersize=3in,5in}\n\\usepackage[utf8]{inputenc}\n\\usepackage{amssymb,amsmath}\n\\pagestyle{empty}\n\\setlength{\\parindent}{0in}\n\\begin{document}\n",
+        "latexPost": "\\end{document}",
+        "mod": 1568390094,
+        "usn": -1,
+        "vers": [],
+        "type": 0,
+        "css": ".card {\n font-family: arial;\n font-size: 20px;\n text-align: center;\n color: black;\n background-color: white;\n}\n",
+        "name": "Basic (optional reversed card, with pdf references)",
+        "flds": [
+            {
+                "name": "Front",
+                "ord": 0,
+                "sticky": false,
+                "rtl": false,
+                "font": "Arial",
+                "size": 20,
+                "media": []
+            },
+            {
+                "name": "Back",
+                "ord": 1,
+                "sticky": false,
+                "rtl": false,
+                "font": "Arial",
+                "size": 20,
+                "media": []
+            },
+            {
+                "name": "Add Reverse",
+                "ord": 2,
+                "sticky": false,
+                "rtl": false,
+                "font": "Arial",
+                "size": 20,
+                "media": []
+            },
+            {
+                "name": "external_source",
+                "ord": 3,
+                "sticky": false,
+                "rtl": false,
+                "font": "Arial",
+                "size": 20,
+                "media": []
+            },
+            {
+                "name": "external_page",
+                "ord": 4,
+                "sticky": false,
+                "rtl": false,
+                "font": "Arial",
+                "size": 20,
+                "media": []
+            }
+        ],
+        "tmpls": [
+            {
+                "name": "Card 1",
+                "ord": 0,
+                "qfmt": "{{Front}}",
+                "afmt": "{{FrontSide}}\n\n<hr id=answer>\n\n{{Back}}\n<br><br><br><a href='javascript:pycmd(\"pdfjs319501851{{text:external_source}}319501851{{text:external_page}}\");'>{{external_source}}</a>",
+                "did": null,
+                "bqfmt": "",
+                "bafmt": ""
+            },
+            {
+                "name": "Card 2",
+                "ord": 1,
+                "qfmt": "{{#Add Reverse}}{{Back}}{{/Add Reverse}}",
+                "afmt": "{{FrontSide}}\n\n<hr id=answer>\n\n{{Front}}\n<br><br><br><a href='javascript:pycmd(\"pdfjs319501851{{text:external_source}}319501851{{text:external_page}}\");'>{{external_source}}</a>",
+                "did": null,
+                "bqfmt": "",
+                "bafmt": ""
+            }
+        ],
+        "tags": [],
+        "id": "1568390094746",
+        "req": [
+            [
+                0,
+                "all",
+                [
+                    0
+                ]
+            ],
+            [
+                1,
+                "all",
+                [
+                    1,
+                    2
+                ]
+            ]
+        ]
+    },
+    "adjBasicReverse": {
+        "sortf": 0,
+        "did": 1,
+        "latexPre": "\\documentclass[12pt]{article}\n\\special{papersize=3in,5in}\n\\usepackage[utf8]{inputenc}\n\\usepackage{amssymb,amsmath}\n\\pagestyle{empty}\n\\setlength{\\parindent}{0in}\n\\begin{document}\n",
+        "latexPost": "\\end{document}",
+        "mod": 1568390094,
+        "usn": -1,
+        "vers": [],
+        "type": 0,
+        "css": ".card {\n font-family: arial;\n font-size: 20px;\n text-align: center;\n color: black;\n background-color: white;\n}\n",
+        "name": "Basic (and reversed card, with pdf references)",
+        "flds": [
+            {
+                "name": "Front",
+                "ord": 0,
+                "sticky": false,
+                "rtl": false,
+                "font": "Arial",
+                "size": 20,
+                "media": []
+            },
+            {
+                "name": "Back",
+                "ord": 1,
+                "sticky": false,
+                "rtl": false,
+                "font": "Arial",
+                "size": 20,
+                "media": []
+            },
+            {
+                "name": "external_source",
+                "ord": 2,
+                "sticky": false,
+                "rtl": false,
+                "font": "Arial",
+                "size": 20,
+                "media": []
+            },
+            {
+                "name": "external_page",
+                "ord": 3,
+                "sticky": false,
+                "rtl": false,
+                "font": "Arial",
+                "size": 20,
+                "media": []
+            }
+        ],
+        "tmpls": [
+            {
+                "name": "Card 1",
+                "ord": 0,
+                "qfmt": "{{Front}}",
+                "afmt": "{{FrontSide}}\n\n<hr id=answer>\n\n{{Back}}\n<br><br><br><a href='javascript:pycmd(\"pdfjs319501851{{text:external_source}}319501851{{text:external_page}}\");'>{{external_source}}</a>",
+                "did": null,
+                "bqfmt": "",
+                "bafmt": ""
+            },
+            {
+                "name": "Card 2",
+                "ord": 1,
+                "qfmt": "{{Back}}",
+                "afmt": "{{FrontSide}}\n\n<hr id=answer>\n\n{{Front}}\n<br><br><br><a href='javascript:pycmd(\"pdfjs319501851{{text:external_source}}319501851{{text:external_page}}\");'>{{external_source}}</a>",
+                "did": null,
+                "bqfmt": "",
+                "bafmt": ""
+            }
+        ],
+        "tags": [],
+        "id": "1568390094751",
+        "req": [
+            [
+                0,
+                "all",
+                [
+                    0
+                ]
+            ],
+            [
+                1,
+                "all",
+                [
+                    1
+                ]
+            ]
+        ]
+    }
+}

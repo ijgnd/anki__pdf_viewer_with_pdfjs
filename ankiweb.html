@@ -1,0 +1,41 @@
+This add-on adds a note type with the fields "external_source" (for a value like "my lecture notes.pdf") and "external_page" (for a value like "123"). This add-on transforms the values you enter so that during review you have a hyperlink on your card. This hyperlink opens a pdf-viewer window which shows page 123 of the file "my lecture notes.pdf". 
+
+Read the whole description on this page and use this at your own risk.
+
+Sometimes I notice that a card is too short and the info on the card is not really meaningful to me anymore. With this add-on I can quickly refresh my memory and add additional info from the source to this note.
+
+Add-ons that modify the reviewer don't work on Ankimobile or Ankidroid. So this add-on doesn't help on mobile. This add-on uses the pdf viewer that's also built into Firefox.
+
+The pdf files are only show if they are in a special folder that you can configure from the add-ons dialog. I'll refer to this folder with pdf-folder from now on. By default the pdf-folder is a folder named "Ankifiles" in your Documents folder.
+
+You must only put the file name of the pdf into the field "external_source", e.g. "my lecture notes.pdf". You may not write "file:////Users/myname/Documents/Ankifiles/my lecture notes.pdf" or "C:\\Users\myname\Documents\my lecture notes.pdf". You may only add numbers into the field "external_page" like "123". You may not write "page 123" or "p. 123".
+
+If you create many notes/cards from the same pdf the add-ons like [Frozen Fields](https://ankiweb.net/shared/info/516643804) or [Field history](https://ankiweb.net/shared/info/1247884413) make it much easier to fill out these fields.
+
+<b># configuration for your own note types</b>
+Instead of using the additional note types you can also adjust your existing ones. This is relevant if you have some custom styling. This requires some configuration:
+
+- You must add the fields "external_source" and "external_page" to the notetypes that link to pdfs. If you don't know what I mean by 'add fields to your note type' watch about one minute of this <a href="https://www.youtube.com/watch?v=JTKqd4nqsK0&feature=youtu.be&t=22" rel="nofollow">youtube-video</a>.
+- You must add the hyperlink to your "front template" or "back template" in the "Card Types for ..." window. If you don't know what I mean by "front template" or "Card Types for ... window" watch this <a href="https://www.youtube.com/watch?v=HgKDRTTTnh4" rel="nofollow">youtube-video</a>. This add-on adds a button named "Ext-Docs-Link" into the "Card Types for ..." window. Click the "Ext-Docs-Link" button to insert the link text into your template.
+
+<b># alternatives</b>
+There's another add-on for viewing pdfs on a specific page named <a href="https://ankiweb.net/shared/info/1994996371" rel="nofollow">Open linked pdf, docx, epub, audio/video, etc. in external Program</a>. This add-on has a complicated setup but offers some advanced features like using a different pdf viewer (e.g. one that allows to edit/highlight your pdfs) or displaying pdf files from any location on your disc. These two-addons are not compatible. You can only have one enabled at each time.
+
+<b># privacy</b>
+As mentioned this add-on only works on pdfs that are in a special folder (pdf-folder). All the files from this folder are accessible for all the cards that you review or preview. It's the same as if the pdf files were in your media folder which includes your audio files and images. 
+
+If you download a malicious shared deck in theory this could include some code that reads the files from your media folder or pdf-folder and sends them to the internet. So far there's no report of such a malicious shared deck. 
+
+To be on the safe side don't set your whole documents folder as the pdf-folder. I would put in  scripts of lectures etc. but I wouldn't put in a super-secret pdf file. If you are an average user using the pdf-folder for a few pdfs is probably not the biggest vulnerability in your digital life.
+
+I believe in informed consent and informing about minor risks. But personally I don't worry: The contents of this folder are just as safe as are your images and audio/sound files. 
+
+Getting pdfs into your cards is a feature that's sometimes requested on in the anki subreddit. A popular solution is to convert the pdf to images and then put them into your media folder. No one ever talked about the security problems of this approach ... 
+
+If you used the old version Anki 2.0 the situation was even worse, for details about  see <a href="https://anki.tenderapp.com/discussions/ankidesktop/15320-security-issues-with-the-anki-browser" rel="nofollow">this discussion from official forum</a>.
+
+<b># bugs etc.</b>
+If you find a bug or have improvements please post them on <a href="" rel="nofollow">github</a>.
+
+<b># Versions </b>
+- 2019-09-14 initial release
