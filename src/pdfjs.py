@@ -3,6 +3,7 @@ anki-addon: pdf viewer (with mozilla's pdfjs)
 
 Copyright (c) 2019 ignd
           (c) 2018 lovac42
+          (c) 2019 arthurmilchior
           (c) Ankitects Pty Ltd and contributors
 
 This program is free software: you can redistribute it and/or modify
@@ -106,7 +107,7 @@ def open_pdf_in_internal_viewer(file, page):
           mw.mediaServer.getPort(), addonfoldername, "pdfjs/web/viewer.html", filename_page_fmt)
     d = NewDialog(mw, url, win_title)
     d.show()
-    
+
 
 def basic_check_filefield(file, showinfos):
     targetfile = os.path.join(gc("pdf_folder_paths"), file)
@@ -116,8 +117,8 @@ def basic_check_filefield(file, showinfos):
                  "there's too much else in the field '%s'. Aborting ..."
                  "\nAlso see the description of the add-on "
                  "''anki pdf viewer (pdfjs)' on ankiweb." % (
-                 file, gc("pdf_folder_paths"), gc("field_for_filename"))
-                )
+                  file, gc("pdf_folder_paths"), gc("field_for_filename"))
+                 )
         if showinfos:
             showInfo(nemsg)
         return
@@ -157,11 +158,11 @@ RequestHandler._redirectWebExports = wrap(RequestHandler._redirectWebExports,
 
 
 def myhelper(editor, menu):
-    filefld = [f["ord"] for f in editor.model['flds'] if f['name'] == gc("field_for_filename")]
+    filefld = [f["ord"] for f in editor.note.model()['flds'] if f['name'] == gc("field_for_filename")]
     if not filefld:
         return
     file = stripHTML(editor.note.fields[filefld[0]])
-    pagefld = [f["ord"] for f in editor.model['flds'] if f['name'] == gc("field_for_page")]
+    pagefld = [f["ord"] for f in editor.note.model()['flds'] if f['name'] == gc("field_for_page")]
     if pagefld:
         page = stripHTML(editor.note.fields[pagefld[0]])
     if basic_check_filefield(file, False):
@@ -173,7 +174,7 @@ def add_to_context(view, menu):
     e = view.editor
     field = e.currentField
     if field:
-        e.saveNow(lambda ed=e,m=menu: myhelper(ed, m))
+        e.saveNow(lambda ed=e, m=menu: myhelper(ed, m))
     else:
         myhelper(e, menu)
 addHook("EditorWebView.contextMenuEvent", add_to_context)

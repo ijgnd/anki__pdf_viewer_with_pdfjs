@@ -1,6 +1,7 @@
 import io
 import json
 import os
+import re
 from pprint import pprint as pp
 
 from anki.hooks import addHook
@@ -11,6 +12,9 @@ from anki.utils import (
 )
 from aqt import mw
 from aqt.qt import *
+from aqt.utils import (
+    showInfo
+)
 
 from .forms import first_run_import
 
@@ -50,6 +54,13 @@ def MaybeSetPath():
         config["pdf_folder_paths"] = FOLDER
         mw.addonManager.writeConfig(__name__, config)
 addHook("profileLoaded", MaybeSetPath)
+
+
+def exists_model(modmodels, thismodel):
+    for m in mw.col.models.all():
+        if thismodel['name'] in m["name"] or thismodel['id'] == m["name"]:
+            return True
+    return
 
 
 class SelectNoteImport(QDialog):
@@ -96,9 +107,19 @@ class SelectNoteImport(QDialog):
             jsonpath = os.path.join(addon_path, "models.json")
             with io.open(jsonpath, encoding="utf-8") as f:
                 mij = f.read()
-            models = json.loads(mij)
+            modmodels = json.loads(mij)
+            skiplist = []
             for e in mta:
-                mw.col.models.add(models[e])
+                thismodel = modmodels[e]
+                if exists_model(modmodels, thismodel):
+                    # print("Model exists")
+                    skiplist.append(thismodel['name'])
+                else:
+                    mw.col.models.add(thismodel)
+            if skiplist:
+                skipmsg = ("The note types\n- %s\nalready seem to exist. Skipping these..." %
+                           ",\n- ".join(skiplist))
+                showInfo(skipmsg)
         self.accept()
 
 
