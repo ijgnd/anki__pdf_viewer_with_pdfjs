@@ -112,7 +112,6 @@ class SelectNoteImport(QDialog):
             for e in mta:
                 thismodel = modmodels[e]
                 if exists_model(modmodels, thismodel):
-                    # print("Model exists")
                     skiplist.append(thismodel['name'])
                 else:
                     mw.col.models.add(thismodel)
