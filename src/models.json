@@ -9,7 +9,7 @@
         "vers": [],
         "type": 0,
         "css": ".card {\n font-family: arial;\n font-size: 20px;\n text-align: center;\n color: black;\n background-color: white;\n}\n",
-        "name": "Basic (with pdf references)",
+        "name": "Basic  (pdf references)",
         "flds": [
             {
                 "name": "Front",
@@ -81,7 +81,7 @@
         "vers": [],
         "type": 1,
         "css": ".card {\n font-family: arial;\n font-size: 20px;\n text-align: center;\n color: black;\n background-color: white;\n}\n\n.cloze {\n font-weight: bold;\n color: blue;\n}\n.nightMode .cloze {\n color: lightblue;\n}",
-        "name": "Cloze (with pdf references)",
+        "name": "Cloze  (pdf references)",
         "flds": [
             {
                 "name": "Text",
