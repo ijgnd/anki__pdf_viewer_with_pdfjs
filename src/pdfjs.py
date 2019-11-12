@@ -37,6 +37,8 @@ from anki.utils import (
 from aqt import mw
 from aqt.qt import *
 from aqt.utils import (
+    restoreGeom,
+    saveGeom,
     showInfo,
     tooltip
 )
@@ -73,12 +75,7 @@ class NewDialog(QDialog):
         super(NewDialog, self).__init__(parent)
         self.url = url
         self.setWindowTitle(win_title)
-        try:
-            w, h = mw.pm.profile["144970292_dimensions"]
-            w, h = int(w), int(h)
-        except:
-            w, h = 790, 1100
-        self.resize(w, h)
+        restoreGeom(self, "319501851")
         mainLayout = QVBoxLayout()
         mainLayout.setContentsMargins(0, 0, 0, 0)
         mainLayout.setSpacing(0)
@@ -95,11 +92,12 @@ class NewDialog(QDialog):
         self.exit_shortcut.activated.connect(self.onReject)
 
     def onReject(self):
-        mw.pm.profile["144970292_dimensions"] = (self.width(), self.height())
+        saveGeom(self, "319501851")
         self.reject()
 
     def closeEvent(self, evnt):
-        mw.pm.profile["144970292_dimensions"] = (self.width(), self.height())
+        saveGeom(self, "319501851")
+
 
     def load_finished(self, success):
         if success:
