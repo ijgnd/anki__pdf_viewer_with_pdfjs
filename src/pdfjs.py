@@ -49,7 +49,15 @@ from . import settings
 
 
 def gc(arg, fail=False):
-    return mw.addonManager.getConfig(__name__).get(arg, fail)
+    try:
+        out = mw.addonManager.getConfig(__name__).get(arg, fail)
+    except:
+        # maybe the user uninstalled the add-on so mw.addonManager.getConfig(__name__)
+        # returns None and this causes "AttributeError: 'NoneType' object 
+        # has no attribute 'get'"
+        return None
+    else:
+        return out
 
 
 addon_path = os.path.dirname(__file__)
