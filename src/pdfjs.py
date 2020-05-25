@@ -34,6 +34,10 @@ from anki.hooks import addHook, wrap
 from anki.utils import (
     stripHTML
 )
+from anki import version as anki_version
+_, _, pointversion = anki_version.split(".")
+pointversion = int(pointversion)
+
 from aqt import mw
 from aqt.qt import *
 from aqt.utils import (
@@ -42,6 +46,8 @@ from aqt.utils import (
     showInfo,
     tooltip
 )
+if pointversion >= 24:
+    from aqt.previewer import Previewer
 from aqt.reviewer import Reviewer
 from aqt.mediasrv import RequestHandler
 from aqt.editor import Editor
@@ -70,9 +76,9 @@ mw.addonManager.setWebExports(__name__, regex)
 web_path = "/_addons/%s/web/" % addonfoldername
 
 
-class NewDialog(QDialog):
+class PdfJsViewer(QDialog):
     def __init__(self, parent, url, win_title):
-        super(NewDialog, self).__init__(parent)
+        super(PdfJsViewer, self).__init__(parent)
         self.url = url
         self.setWindowTitle(win_title)
         restoreGeom(self, "319501851")
@@ -89,11 +95,11 @@ class NewDialog(QDialog):
         self.web.loadFinished.connect(self.load_finished)
         # self.web.setFocus()
         self.exit_shortcut = QShortcut(QKeySequence(Qt.Key_Escape), self)
-        self.exit_shortcut.activated.connect(self.onReject)
+        self.exit_shortcut.activated.connect(self.reject)
 
-    def onReject(self):
+    def reject(self):
         saveGeom(self, "319501851")
-        self.reject()
+        QDialog.reject(self)
 
     def closeEvent(self, evnt):
         saveGeom(self, "319501851")
@@ -111,7 +117,7 @@ def open_pdf_in_internal_viewer(file, page):
     win_title = 'Anki - pdf viewer'
     url = "http://127.0.0.1:%d/_addons/%s/web/%s%s" % (
           mw.mediaServer.getPort(), addonfoldername, "pdfjs/web/viewer.html", filename_page_fmt)
-    d = NewDialog(mw, url, win_title)
+    d = PdfJsViewer(mw, url, win_title)
     d.show()
 
 
@@ -148,6 +154,8 @@ def myLinkHandler(self, url, _old):
     else:
         _old(self, url)
 Reviewer._linkHandler = wrap(Reviewer._linkHandler, myLinkHandler, "around")
+if pointversion >= 24:
+    Previewer._on_bridge_cmd = wrap(Previewer._on_bridge_cmd, myLinkHandler, "around")
 
 
 # from lovac42's Anki Fanfare/main.py from https://github.com/lovac42/Fanfare
