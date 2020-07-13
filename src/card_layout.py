@@ -1,6 +1,6 @@
 from pprint import pprint as pp
 
-from anki.lang import _
+from anki.hooks import wrap
 from aqt.clayout import CardLayout
 from aqt.utils import showInfo
 from aqt.qt import *
@@ -17,34 +17,14 @@ def gc(arg, fail=False):
 
 
 def mySetupButtons(self):
-    l = self.buttons = QHBoxLayout()
-    help = QPushButton(_("Help"))
-    help.setAutoDefault(False)
-    l.addWidget(help)
-    help.clicked.connect(self.onHelp)
-    l.addStretch()
-    onExtDocsLink = QPushButton(_("Ext-Docs-Link"))
+    onExtDocsLink = QPushButton("Ext-Docs-Link")
     onExtDocsLink.setAutoDefault(False)
-    l.addWidget(onExtDocsLink)
+    self.buttons.insertWidget(3, onExtDocsLink)
     onExtDocsLink.clicked.connect(self.onExtDocsLink)
     tm = ("This button belongs to the add-on 'anki pdf viewer (pdfjs)'."
           "For more info go to https://ankiweb.net/shared/info/319501851")
     onExtDocsLink.setToolTip(tm)
-    addField = QPushButton(_("Add Field"))
-    addField.setAutoDefault(False)
-    l.addWidget(addField)
-    addField.clicked.connect(self.onAddField)
-    if not self._isCloze():
-        flip = QPushButton(_("Flip"))
-        flip.setAutoDefault(False)
-        l.addWidget(flip)
-        flip.clicked.connect(self.onFlip)
-    l.addStretch()
-    close = QPushButton(_("Close"))
-    close.setAutoDefault(False)
-    l.addWidget(close)
-    close.clicked.connect(self.accept)
-CardLayout.setupButtons = mySetupButtons
+CardLayout.setupButtons = wrap(CardLayout.setupButtons, mySetupButtons)
 
 
 def onExtDocsLink(self):
