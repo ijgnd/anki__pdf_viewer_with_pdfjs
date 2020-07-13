@@ -155,8 +155,7 @@ def myLinkHandler(self, url, _old):
         page = re.sub(r"\D", "", page)
         if basic_check_filefield(file, True):
             open_pdf_in_internal_viewer(file, page)
-    else:
-        _old(self, url)
+    return _old(self, url)
 Reviewer._linkHandler = wrap(Reviewer._linkHandler, myLinkHandler, "around")
 if pointversion >= 24:
     Previewer._on_bridge_cmd = wrap(Previewer._on_bridge_cmd, myLinkHandler, "around")
