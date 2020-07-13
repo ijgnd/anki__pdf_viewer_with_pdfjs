@@ -182,6 +182,7 @@ def _redirectWebExportsNEW(path, _old):
     if path.startswith("_pdfjspath") and pdf_folder_path:
         if handledfile:
             directory, filename = os.path.split(handledfile)
+            handledfile = None
             if not directory:
                 justfilename = path[11:]
                 return pdf_folder_path, justfilename
