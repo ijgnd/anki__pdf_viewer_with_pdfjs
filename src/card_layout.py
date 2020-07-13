@@ -50,7 +50,7 @@ def onExtDocsLink(self):
     form.font.setCurrentFont(QFont("Arial"))
     form.size.setValue(20)
     diag.show()
-    if not diag.exec_():
+    if not diag.exec():
         return
     if form.radioQ.isChecked():
         obj = self.tform.front
