@@ -120,7 +120,7 @@ def open_pdf_in_internal_viewer(file, page):
     fmt = f"?file=%2F_pdfjspath/{file}#page={page}"
     win_title = 'Anki - pdf viewer'
     port = mw.mediaServer.getPort()
-    url = f"http://127.0.0.1:{port}/_addons/{addonfoldername}/web/pdfjs/web/viewer.html{fmt}" 
+    url = f"http://127.0.0.1:{port}/_addons/{addonfoldername}/web/pdfjs/web/viewer.html{fmt}"
     d = PdfJsViewer(mw, url, win_title)
     d.show()
 
