@@ -54,20 +54,7 @@ from aqt.editor import Editor
 
 from . import card_layout
 from . import settings
-
-
-def gc(arg, fail=False):
-    try:
-        out = mw.addonManager.getConfig(__name__).get(arg, fail)
-    except:
-        return None
-    else:
-        return out
-
-
-from anki import version as anki_version
-_, _, point = anki_version.split(".")
-pointversion = int(point)
+from .config import gc, pointversion
 
 
 addon_path = os.path.dirname(__file__)

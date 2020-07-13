@@ -6,14 +6,11 @@ from aqt.utils import showInfo
 from aqt.qt import *
 from aqt import mw
 
-from .forms import addtofield
-
-
-def gc(arg, fail=False):
-    conf = mw.addonManager.getConfig(__name__)
-    if conf:
-        return conf.get(arg, fail)
-    return fail
+from .config import gc, pointversion
+if pointversion < 28:
+    from .forms import addtofield
+else:
+    from .forms import addtofield28 as addtofield
 
 
 def mySetupButtons(self):
@@ -52,14 +49,18 @@ def onExtDocsLink(self):
     diag.show()
     if not diag.exec():
         return
-    if form.radioQ.isChecked():
-        obj = self.tform.front
+    if pointversion < 28:
+        if form.radioQ.isChecked():
+            obj = self.tform.front
+        else:
+            obj = self.tform.back
     else:
-        obj = self.tform.back
+        obj = self.tform.edit_area
     t = obj.toPlainText()
-    t += ("""<a href='javascript:pycmd("pdfjs319501851"""
+    t += ("""\n<a href='javascript:pycmd("pdfjs319501851"""
           """{{text:%s}}319501851{{text:%s}}");'"""
           """>%s</a>""" % (filefield, pagefield, form.linktext.text()))
     obj.setPlainText(t)
-    self.saveCard()
+    if pointversion < 28:
+        self.saveCard()
 CardLayout.onExtDocsLink = onExtDocsLink
