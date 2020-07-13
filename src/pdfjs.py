@@ -60,9 +60,6 @@ def gc(arg, fail=False):
     try:
         out = mw.addonManager.getConfig(__name__).get(arg, fail)
     except:
-        # maybe the user uninstalled the add-on so mw.addonManager.getConfig(__name__)
-        # returns None and this causes "AttributeError: 'NoneType' object 
-        # has no attribute 'get'"
         return None
     else:
         return out
