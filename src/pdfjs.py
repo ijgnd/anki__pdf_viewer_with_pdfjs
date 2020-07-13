@@ -49,7 +49,7 @@ from aqt.utils import (
 if pointversion >= 24:
     from aqt.previewer import Previewer
 from aqt.reviewer import Reviewer
-from aqt.mediasrv import RequestHandler
+import aqt.mediasrv as mediasrv
 from aqt.editor import Editor
 
 from . import card_layout
@@ -63,6 +63,11 @@ def gc(arg, fail=False):
         return None
     else:
         return out
+
+
+from anki import version as anki_version
+_, _, point = anki_version.split(".")
+pointversion = int(point)
 
 
 addon_path = os.path.dirname(__file__)
@@ -101,7 +106,6 @@ class PdfJsViewer(QDialog):
     def closeEvent(self, evnt):
         saveGeom(self, "319501851")
 
-
     def load_finished(self, success):
         if success:
             self.web.show()
@@ -109,11 +113,14 @@ class PdfJsViewer(QDialog):
             tooltip('page failed to load')
 
 
+handledfile = None
 def open_pdf_in_internal_viewer(file, page):
-    filename_page_fmt = """?file=%%2F%s%s#page=%s""" % ("_pdfjspath/", file, page)
+    global handledfile
+    handledfile = file
+    fmt = f"?file=%2F_pdfjspath/{file}#page={page}"
     win_title = 'Anki - pdf viewer'
-    url = "http://127.0.0.1:%d/_addons/%s/web/%s%s" % (
-          mw.mediaServer.getPort(), addonfoldername, "pdfjs/web/viewer.html", filename_page_fmt)
+    port = mw.mediaServer.getPort()
+    url = f"http://127.0.0.1:{port}/_addons/{addonfoldername}/web/pdfjs/web/viewer.html{fmt}" 
     d = PdfJsViewer(mw, url, win_title)
     d.show()
 
@@ -164,8 +171,26 @@ def _redirectWebExports(self, path, _old):
         targetLength = len(targetPath)+1
         return os.path.join(pdf_folder_path, path[targetLength:])
     return _old(self, path)
-RequestHandler._redirectWebExports = wrap(RequestHandler._redirectWebExports,
+if pointversion < 28:
+    mediasrv.RequestHandler._redirectWebExports = wrap(mediasrv.RequestHandler._redirectWebExports,
                                           _redirectWebExports, 'around')
+
+
+def _redirectWebExportsNEW(path, _old):
+    global handledfile
+    pdf_folder_path = gc("pdf_folder_paths", "")
+    if path.startswith("_pdfjspath") and pdf_folder_path:
+        if handledfile:
+            directory, filename = os.path.split(handledfile)
+            if not directory:
+                justfilename = path[11:]
+                return pdf_folder_path, justfilename
+            else:
+                return directory, filename
+    return _old(path)
+if pointversion >= 28:
+    mediasrv._redirectWebExports = wrap(mediasrv._redirectWebExports,
+                                          _redirectWebExportsNEW, 'around')
 
 
 def myhelper(editor, menu):
