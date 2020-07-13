@@ -10,7 +10,10 @@ from .forms import addtofield
 
 
 def gc(arg, fail=False):
-    return mw.addonManager.getConfig(__name__.split(".")[0]).get(arg, fail)
+    conf = mw.addonManager.getConfig(__name__)
+    if conf:
+        return conf.get(arg, fail)
+    return fail
 
 
 def mySetupButtons(self):
