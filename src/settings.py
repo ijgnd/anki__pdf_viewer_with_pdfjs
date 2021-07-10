@@ -2,25 +2,22 @@ import io
 import json
 import os
 import re
-from pprint import pprint as pp
+from pprint import pprint as pp  # noqa
 
 from anki.hooks import addHook
 from anki.utils import (
     isLin,
     isMac,
-    isWin
+    isWin,
+    pointVersion,
 )
 from aqt import mw
 from aqt.qt import *
 from aqt.utils import (
-    showInfo
+    showInfo,
 )
-
-from .forms import first_run_import
-
-
-def gc(arg, fail=False):
-    return mw.addonManager.getConfig(__name__.split(".")[0]).get(arg, fail)
+from .config import gc
+from .forms import first_run_import  # noqa
 
 
 def MaybeSetPath():
@@ -124,10 +121,9 @@ class SelectNoteImport(QDialog):
 
 def MaybeAddModels():
     config = mw.addonManager.getConfig(__name__.split(".")[0])
-    if config.get("show_first_run_message", True):
+    if config.get("show_first_run_message", True) and pointVersion() < 45:
         config["show_first_run_message"] = False
         mw.addonManager.writeConfig(__name__.split(".")[0], config)
         d = SelectNoteImport()
         d.exec()
-
-addHook("profileLoaded", MaybeAddModels)
+addHook("profileLoaded", MaybeAddModels)  # noqa

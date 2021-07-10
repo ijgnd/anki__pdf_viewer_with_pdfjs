@@ -24,19 +24,18 @@ This add-on uses mozilla's pdfjs which uses a license other than AGPL3, see
 the comments on top of the files in the folder web/pdfjs.
 """
 
-
 import os
-import io
 import re
-from pprint import pprint as pp
+from pprint import pprint as pp  # noqa
 
 from anki.hooks import addHook, wrap
 from anki.utils import (
     stripHTML
 )
-from anki import version as anki_version
-_, _, pointversion = anki_version.split(".")
-pointversion = int(pointversion)
+from .config import (
+    gc,
+    pointversion,
+)
 
 from aqt import mw
 from aqt.qt import *
@@ -44,17 +43,12 @@ from aqt.utils import (
     restoreGeom,
     saveGeom,
     showInfo,
-    tooltip
+    tooltip,
 )
 if pointversion >= 24:
     from aqt.previewer import Previewer
 from aqt.reviewer import Reviewer
 import aqt.mediasrv as mediasrv
-from aqt.editor import Editor
-
-from . import card_layout
-from . import settings
-from .config import gc, pointversion
 
 
 addon_path = os.path.dirname(__file__)
@@ -128,7 +122,7 @@ def basic_check_filefield(file, showinfos):
     if file.startswith("file:/"):
         vmsg = ("illegal values in field '%s'. See description of the add-on "
                 "'anki pdf viewer (pdfjs)' on Ankiweb. Aborting..." % 
-                gc("field_for_filename","")
+                gc("field_for_filename", "")
                 )
         if showinfos:
             showInfo(vmsg)
@@ -186,6 +180,7 @@ def myhelper(editor, menu):
         return
     file = stripHTML(editor.note.fields[filefld[0]])
     pagefld = [f["ord"] for f in editor.note.model()['flds'] if f['name'] == gc("field_for_page")]
+    page = ""
     if pagefld:
         page = stripHTML(editor.note.fields[pagefld[0]])
     if basic_check_filefield(file, False):
@@ -200,4 +195,4 @@ def add_to_context(view, menu):
         e.saveNow(lambda ed=e, m=menu: myhelper(ed, m))
     else:
         myhelper(e, menu)
-addHook("EditorWebView.contextMenuEvent", add_to_context)
+addHook("EditorWebView.contextMenuEvent", add_to_context)  # noqa

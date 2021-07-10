@@ -1,32 +1,31 @@
-from pprint import pprint as pp
+from pprint import pprint as pp  # noqa
 
 from anki.hooks import wrap
 from aqt.clayout import CardLayout
 from aqt.utils import showInfo
 from aqt.qt import *
-from aqt import mw
 
 from .config import gc, pointversion
 if pointversion < 28:
-    from .forms import addtofield
+    from .forms import addtofield  # noqa
 else:
-    from .forms import addtofield28 as addtofield
+    from .forms import addtofield28 as addtofield  # noqa
 
 
-def mySetupButtons(self):
-    onExtDocsLink = QPushButton("Ext-Docs-Link")
-    onExtDocsLink.setAutoDefault(False)
-    self.buttons.insertWidget(3, onExtDocsLink)
-    onExtDocsLink.clicked.connect(self.onExtDocsLink)
+def my_setup_buttons(self):
+    on_ext_docs_but = QPushButton("Ext-Docs-Link")
+    on_ext_docs_but.setAutoDefault(False)
+    self.buttons.insertWidget(3, on_ext_docs_but)
+    on_ext_docs_but.clicked.connect(self.on_ext_docs_link)
     tm = ("This button belongs to the add-on 'anki pdf viewer (pdfjs)'."
           "For more info go to https://ankiweb.net/shared/info/319501851")
-    onExtDocsLink.setToolTip(tm)
-CardLayout.setupButtons = wrap(CardLayout.setupButtons, mySetupButtons)
+    on_ext_docs_but.setToolTip(tm)
+CardLayout.setupButtons = wrap(CardLayout.setupButtons, my_setup_buttons)  # noqa
 
 
-def onExtDocsLink(self):
-    filefield =  gc("field_for_filename","external_source")
-    pagefield = gc("field_for_page","external_page")
+def on_ext_docs_link(self):
+    filefield = gc("field_for_filename", "external_source")
+    pagefield = gc("field_for_page", "external_page")
     fieldnames = [f['name'] for f in self.model['flds']]
     if filefield not in fieldnames or pagefield not in fieldnames:
         msg = ("Your setup for the Add-on 'anki pdf viewer (pdfjs)' "
@@ -63,4 +62,4 @@ def onExtDocsLink(self):
     obj.setPlainText(t)
     if pointversion < 28:
         self.saveCard()
-CardLayout.onExtDocsLink = onExtDocsLink
+CardLayout.on_ext_docs_link = on_ext_docs_link  # noqa
