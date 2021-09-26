@@ -30,7 +30,8 @@ from pprint import pprint as pp  # noqa
 
 from anki.hooks import addHook, wrap
 from anki.utils import (
-    stripHTML
+    pointVersion,
+    stripHTML,
 )
 from .config import (
     gc,
@@ -62,6 +63,10 @@ web_path = "/_addons/%s/web/" % addonfoldername
 class PdfJsViewer(QDialog):
     def __init__(self, parent, url, win_title):
         super(PdfJsViewer, self).__init__(parent)
+        if pointVersion() <45:
+            mw.setupDialogGC(self)
+        else:
+            mw.garbage_collect_on_dialog_finish(self)
         self.url = url
         self.setWindowTitle(win_title)
         restoreGeom(self, "319501851")
