@@ -95,16 +95,87 @@ class PdfJsViewer(QDialog):
             tooltip('page failed to load')
 
 
+class ChromiumPdfViewerWindow(QDialog):
+    def __init__(self, parent, url, win_title):
+        super(ChromiumPdfViewerWindow, self).__init__(parent)
+        self.parent = parent
+        self.setWindowTitle(win_title)
+        mainLayout = QVBoxLayout()
+        mainLayout.setContentsMargins(0, 0, 0, 0)
+        mainLayout.setSpacing(0)
+        self.setLayout(mainLayout)
+        self.setGeometry(0, 28, 1000, 750)
+        self.webview = QWebEngineView()
+        self.webview.settings().setAttribute(QWebEngineSettings.PluginsEnabled, True)
+        self.webview.settings().setAttribute(QWebEngineSettings.PdfViewerEnabled, True)
+        mainLayout.addWidget(self.webview)
+        url_as_qurl = QUrl(url)
+        self.webview.load(url_as_qurl)
+
+        # "#page=" are ignored in pyqt5
+        # https://stackoverflow.com/questions/60560583/open-pdf-at-specific-page-with-qt-webengineview
+        # apparently a bug in qt5: https://bugreports.qt.io/browse/QTBUG-86152
+        # this pyqt6 minimal external program works: https://python-forum.io/thread-36741-post-155217.html#pid155217
+        # this pyqt5 minimal external program does not work: https://python-forum.io/thread-36741-post-155207.html#pid155207
+        # so I need a workaround for pyqt5
+        # inspired by https://stackoverflow.com/questions/60560583/open-pdf-at-specific-page-with-qt-webengineview
+        # workaround for qt5 to open specific pages
+        self.webview.loadFinished.connect(self.load_finished)
+        self.page_num = None
+        if "#page=" in url:
+            self.page_num = url.split("#page=")[1]
+            try:
+                int(self.page_num)
+            except:
+                self.page_num = None
+    
+    def go_to_page(self):
+        # this solution was suggested by eyllanesc in 2020-03. 
+        # https://stackoverflow.com/questions/60560583/open-pdf-at-specific-page-with-qt-webengineview
+        # it doesn't work for me (and neither in 2021-03 for
+        # https://forum.qt.io/topic/126003/qwebengineview-to-view-local-pdf-at-certain-page
+        # I get:
+        # Qt critical: Uncaught TypeError: Cannot read property 'viewport_' of null '1,'
+        if self.page_num:
+            self.webview.page().runJavaScript(f"window.viewer.viewport_.goToPage({self.page_num})")
+    
+    def load_finished(self):
+        # if success and self.page_num:
+        t = QTimer(self.parent)
+        t.timeout.connect(self.go_to_page)  # type: ignore
+        t.setSingleShot(True)
+        t.start(1000)   
+        self.go_to_page()
+
+
 handledfile = None
+
+
 def open_pdf_in_internal_viewer__with_pdfjs(file, page):
-    global handledfile
-    handledfile = file
-    fmt = f"?file=%2F_pdfjspath/{file}#page={page}"
+    fmt = f"?file=/_pdfjspath/{file}#page={page}"
     win_title = 'Anki - pdf viewer'
     port = mw.mediaServer.getPort()
     url = f"http://127.0.0.1:{port}/_addons/{addonfoldername}/web/pdfjs/web/viewer.html{fmt}"
     d = PdfJsViewer(mw, url, win_title)
     d.show()
+
+
+def open_pdf_in_internal_viewer__with_chromium_pdf(file, page):
+    win_title = 'Anki - pdf viewer'
+    port = mw.mediaServer.getPort()
+    # url = f"{file}#page={page}"  # for pdfs in the media folder
+    url = f"http://127.0.0.1:{port}/_pdfjspath/{file}#page={page}"
+    d = ChromiumPdfViewerWindow(mw, url, win_title)
+    d.show()
+
+
+def open_pdf_in_internal_viewer_helper(file, page):
+    global handledfile
+    handledfile = file
+    if gc("use pdfjs to show pdfs", False):
+        open_pdf_in_internal_viewer__with_pdfjs(file, page)
+    else:
+        open_pdf_in_internal_viewer__with_chromium_pdf(file, page)
 
 
 def basic_check_filefield(file, showinfos):
@@ -136,8 +207,9 @@ def myLinkHandler(self, url, _old):
         file, page = url.replace("pdfjs319501851", "").split("319501851")
         page = re.sub(r"\D", "", page)
         if basic_check_filefield(file, True):
-            open_pdf_in_internal_viewer__with_pdfjs(file, page)
-    return _old(self, url)
+            open_pdf_in_internal_viewer_helper(file, page)
+    else:    
+        return _old(self, url)
 Reviewer._linkHandler = wrap(Reviewer._linkHandler, myLinkHandler, "around")
 Previewer._on_bridge_cmd = wrap(Previewer._on_bridge_cmd, myLinkHandler, "around")
 
@@ -146,15 +218,17 @@ def _redirectWebExports(path, _old):
     global handledfile
     pdf_folder_path = gc("pdf_folder_paths", "")
     if path.startswith("_pdfjspath") and pdf_folder_path:
-        if handledfile:
-            directory, filename = os.path.split(handledfile)
-            handledfile = None
-            if not directory:
-                justfilename = path[11:]
-                return pdf_folder_path, justfilename
-            else:
+        directory, filename = os.path.split(handledfile)
+        # handledfile = None  # this breaks open_pdf_in_internal_viewer__with_chromium_pdf: for some reason _redirectWebExports is called twice
+        if not directory:
+            justfilename = path[11:]
+            print(f"pdf_folder_path: __{pdf_folder_path}__, __{justfilename}__")
+            return pdf_folder_path, justfilename
+        else:
+            if gc("open pdfs from other paths than the default path"):
                 return directory, filename
-    return _old(path)
+    else:
+        return _old(path)
 mediasrv._redirectWebExports = wrap(mediasrv._redirectWebExports,
                                           _redirectWebExports, 'around')
 
@@ -170,7 +244,7 @@ def myhelper(editor, menu):
         page = stripHTML(editor.note.fields[pagefld[0]])
     if basic_check_filefield(file, False):
         a = menu.addAction("open pdf")
-        a.triggered.connect(lambda _, f=file, p=page: open_pdf_in_internal_viewer__with_pdfjs(f, p))
+        a.triggered.connect(lambda _, f=file, p=page: open_pdf_in_internal_viewer_helper(f, p))
 
 
 def add_to_context(view, menu):

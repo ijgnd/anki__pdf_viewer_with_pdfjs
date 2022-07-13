@@ -2,5 +2,7 @@
     "field_for_filename": "external_source",
     "field_for_page": "external_page",
     "pdf_folder_paths": "",
-    "show_first_run_message": true
+    "open pdfs from other paths than the default path":  false,
+    "show_first_run_message": true,
+    "use pdfjs to show pdfs": true
 }
