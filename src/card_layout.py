@@ -53,13 +53,7 @@ def on_ext_docs_link(self):
     diag.show()
     if not diag.exec():
         return
-    if pointversion < 28:
-        if form.radioQ.isChecked():
-            obj = self.tform.front
-        else:
-            obj = self.tform.back
-    else:
-        obj = self.tform.edit_area
+    obj = self.tform.edit_area
     t = obj.toPlainText()
     t += ("""\n<a href='javascript:pycmd("pdfjs319501851"""
           """{{text:%s}}319501851{{text:%s}}");'"""
