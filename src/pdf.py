@@ -45,7 +45,7 @@ from aqt.utils import (
     showInfo,
     tooltip,
 )
-    from aqt.previewer import Previewer
+from aqt.previewer import Previewer
 from aqt.reviewer import Reviewer
 import aqt.mediasrv as mediasrv
 
@@ -98,7 +98,7 @@ class PdfJsViewer(QDialog):
 
 
 handledfile = None
-def open_pdf_in_internal_viewer(file, page):
+def open_pdf_in_internal_viewer__with_pdfjs(file, page):
     global handledfile
     handledfile = file
     fmt = f"?file=%2F_pdfjspath/{file}#page={page}"
@@ -138,10 +138,10 @@ def myLinkHandler(self, url, _old):
         file, page = url.replace("pdfjs319501851", "").split("319501851")
         page = re.sub(r"\D", "", page)
         if basic_check_filefield(file, True):
-            open_pdf_in_internal_viewer(file, page)
+            open_pdf_in_internal_viewer__with_pdfjs(file, page)
     return _old(self, url)
 Reviewer._linkHandler = wrap(Reviewer._linkHandler, myLinkHandler, "around")
-    Previewer._on_bridge_cmd = wrap(Previewer._on_bridge_cmd, myLinkHandler, "around")
+Previewer._on_bridge_cmd = wrap(Previewer._on_bridge_cmd, myLinkHandler, "around")
 
 
 def _redirectWebExports(path, _old):
@@ -157,7 +157,7 @@ def _redirectWebExports(path, _old):
             else:
                 return directory, filename
     return _old(path)
-    mediasrv._redirectWebExports = wrap(mediasrv._redirectWebExports,
+mediasrv._redirectWebExports = wrap(mediasrv._redirectWebExports,
                                           _redirectWebExports, 'around')
 
 
@@ -172,7 +172,7 @@ def myhelper(editor, menu):
         page = stripHTML(editor.note.fields[pagefld[0]])
     if basic_check_filefield(file, False):
         a = menu.addAction("open pdf")
-        a.triggered.connect(lambda _, f=file, p=page: open_pdf_in_internal_viewer(f, p))
+        a.triggered.connect(lambda _, f=file, p=page: open_pdf_in_internal_viewer__with_pdfjs(f, p))
 
 
 def add_to_context(view, menu):
