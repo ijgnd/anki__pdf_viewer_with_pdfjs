@@ -4,5 +4,6 @@
     "pdf_folder_paths": "",
     "open pdfs from other paths than the default path":  false,
     "show_first_run_message": true,
+    "pdf_js_version_used": "latest",
     "use pdfjs to show pdfs": true
 }
