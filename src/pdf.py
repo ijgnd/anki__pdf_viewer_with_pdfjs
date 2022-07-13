@@ -46,7 +46,6 @@ from aqt.utils import (
     showInfo,
     tooltip,
 )
-if pointversion >= 24:
     from aqt.previewer import Previewer
 from aqt.reviewer import Reviewer
 import aqt.mediasrv as mediasrv
@@ -143,25 +142,10 @@ def myLinkHandler(self, url, _old):
             open_pdf_in_internal_viewer(file, page)
     return _old(self, url)
 Reviewer._linkHandler = wrap(Reviewer._linkHandler, myLinkHandler, "around")
-if pointversion >= 24:
     Previewer._on_bridge_cmd = wrap(Previewer._on_bridge_cmd, myLinkHandler, "around")
 
 
-# from lovac42's Anki Fanfare/main.py from https://github.com/lovac42/Fanfare
-# Replace /user/collection.media folder with actual addon path
-def _redirectWebExports(self, path, _old):
-    targetPath = os.path.join(os.getcwd(), "_pdfjspath")
-    pdf_folder_path = gc("pdf_folder_paths", "")
-    if path.startswith(targetPath) and pdf_folder_path:
-        targetLength = len(targetPath)+1
-        return os.path.join(pdf_folder_path, path[targetLength:])
-    return _old(self, path)
-if pointversion < 28:
-    mediasrv.RequestHandler._redirectWebExports = wrap(mediasrv.RequestHandler._redirectWebExports,
-                                          _redirectWebExports, 'around')
-
-
-def _redirectWebExportsNEW(path, _old):
+def _redirectWebExports(path, _old):
     global handledfile
     pdf_folder_path = gc("pdf_folder_paths", "")
     if path.startswith("_pdfjspath") and pdf_folder_path:
@@ -174,9 +158,8 @@ def _redirectWebExportsNEW(path, _old):
             else:
                 return directory, filename
     return _old(path)
-if pointversion >= 28:
     mediasrv._redirectWebExports = wrap(mediasrv._redirectWebExports,
-                                          _redirectWebExportsNEW, 'around')
+                                          _redirectWebExports, 'around')
 
 
 def myhelper(editor, menu):
