@@ -65,6 +65,4 @@ def on_ext_docs_link(self):
           """{{text:%s}}319501851{{text:%s}}");'"""
           """>%s</a>""" % (filefield, pagefield, form.linktext.text()))
     obj.setPlainText(t)
-    if pointversion < 28:
-        self.saveCard()
 CardLayout.on_ext_docs_link = on_ext_docs_link  # noqa
