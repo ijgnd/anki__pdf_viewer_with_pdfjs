@@ -225,7 +225,6 @@ if anki_point_version <= 49:
             # handledfile = None  # this breaks open_pdf_in_internal_viewer__with_chromium_pdf: for some reason _redirectWebExports is called twice
             if not directory:
                 justfilename = path[11:]
-                print(f"pdf_folder_path: __{pdf_folder_path}__, __{justfilename}__")
                 return pdf_folder_path, justfilename
             else:
                 if gc("open pdfs from other paths than the default path"):
@@ -250,7 +249,6 @@ if anki_point_version >= 50:
             # handledfile = None  # this breaks open_pdf_in_internal_viewer__with_chromium_pdf: for some reason _redirectWebExports is called twice
             if not directory:
                 justfilename = path[11:]
-                print(f"pdf_folder_path: __{pdf_folder_path}__, __{justfilename}__")
                 return LocalFileRequest(root=pdf_folder_path, path=justfilename)
             else:
                 if gc("open pdfs from other paths than the default path"):
