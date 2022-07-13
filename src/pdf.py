@@ -32,10 +32,8 @@ from anki.hooks import addHook, wrap
 from anki.utils import (
     stripHTML,
 )
-from .config import (
-    gc,
-    pointversion,
-)
+from .anki_version_detection import anki_point_version
+from .config import gc
 
 from aqt import mw
 from aqt.qt import *
@@ -61,7 +59,7 @@ web_path = "/_addons/%s/web/" % addonfoldername
 class PdfJsViewer(QDialog):
     def __init__(self, parent, url, win_title):
         super(PdfJsViewer, self).__init__(parent)
-        if pointVersion() <45:
+        if anki_point_version < 45:
             mw.setupDialogGC(self)
         else:
             mw.garbage_collect_on_dialog_finish(self)

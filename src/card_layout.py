@@ -5,8 +5,10 @@ from aqt.clayout import CardLayout
 from aqt.utils import showInfo
 from aqt.qt import *
 
-from .config import gc, pointversion
-if pointversion < 28:
+from .anki_version_detection import anki_point_version
+from .config import gc
+
+if anki_point_version < 28:
     from .forms5 import addtofield  # noqa
 else:
     if qtmajor == 5:

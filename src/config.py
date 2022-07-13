@@ -7,8 +7,3 @@ def gc(arg, fail=False):
         return None
     else:
         return out
-
-
-from anki import version as anki_version
-_, _, point = anki_version.split(".")
-pointversion = int(point)
