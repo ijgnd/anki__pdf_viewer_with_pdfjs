@@ -78,7 +78,7 @@ class PdfJsViewer(QDialog):
         self.web.show()
         self.web.loadFinished.connect(self.load_finished)
         # self.web.setFocus()
-        self.exit_shortcut = QShortcut(QKeySequence(Qt.Key_Escape), self)
+        self.exit_shortcut = QShortcut(QKeySequence(Qt.Key.Key_Escape), self)
         self.exit_shortcut.activated.connect(self.reject)
 
     def reject(self):
@@ -216,23 +216,50 @@ Reviewer._linkHandler = wrap(Reviewer._linkHandler, myLinkHandler, "around")
 Previewer._on_bridge_cmd = wrap(Previewer._on_bridge_cmd, myLinkHandler, "around")
 
 
-def _redirectWebExports(path, _old):
-    global handledfile
-    pdf_folder_path = gc("pdf_folder_paths", "")
-    if path.startswith("_pdfjspath") and pdf_folder_path:
-        directory, filename = os.path.split(handledfile)
-        # handledfile = None  # this breaks open_pdf_in_internal_viewer__with_chromium_pdf: for some reason _redirectWebExports is called twice
-        if not directory:
-            justfilename = path[11:]
-            print(f"pdf_folder_path: __{pdf_folder_path}__, __{justfilename}__")
-            return pdf_folder_path, justfilename
+if anki_point_version <= 49:
+    def _redirectWebExports(path, _old):
+        global handledfile
+        pdf_folder_path = gc("pdf_folder_paths", "")
+        if path.startswith("_pdfjspath") and pdf_folder_path:
+            directory, filename = os.path.split(handledfile)
+            # handledfile = None  # this breaks open_pdf_in_internal_viewer__with_chromium_pdf: for some reason _redirectWebExports is called twice
+            if not directory:
+                justfilename = path[11:]
+                print(f"pdf_folder_path: __{pdf_folder_path}__, __{justfilename}__")
+                return pdf_folder_path, justfilename
+            else:
+                if gc("open pdfs from other paths than the default path"):
+                    return directory, filename
         else:
-            if gc("open pdfs from other paths than the default path"):
-                return directory, filename
-    else:
-        return _old(path)
-mediasrv._redirectWebExports = wrap(mediasrv._redirectWebExports,
-                                          _redirectWebExports, 'around')
+            return _old(path)
+    mediasrv._redirectWebExports = wrap(mediasrv._redirectWebExports,
+                                              _redirectWebExports, 'around')
+
+
+if anki_point_version >= 50:
+    # LocalFileRequest takes two args:
+        # base folder, eg media folder
+        # path to file relative to root folder
+    from aqt.mediasrv import LocalFileRequest
+
+    def _extract_pdf_request(path, _old):
+        global handledfile
+        pdf_folder_path = gc("pdf_folder_paths", "")
+        if path.startswith("_pdfjspath") and pdf_folder_path:
+            directory, filename = os.path.split(handledfile)
+            # handledfile = None  # this breaks open_pdf_in_internal_viewer__with_chromium_pdf: for some reason _redirectWebExports is called twice
+            if not directory:
+                justfilename = path[11:]
+                print(f"pdf_folder_path: __{pdf_folder_path}__, __{justfilename}__")
+                return LocalFileRequest(root=pdf_folder_path, path=justfilename)
+            else:
+                if gc("open pdfs from other paths than the default path"):
+                    return LocalFileRequest(root=pdf_folder_path, path=justfilename)
+        else:
+            return _old(path)
+
+    mediasrv._extract_addon_request = wrap(mediasrv._extract_addon_request,
+                                                _extract_pdf_request, 'around')
 
 
 def myhelper(editor, menu):

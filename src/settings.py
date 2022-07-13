@@ -67,7 +67,7 @@ def exists_model(modmodels, thismodel):
 class SelectNoteImport(QDialog):
     def __init__(self, parent=None, entries=[]):
         self.parent = parent
-        QDialog.__init__(self, parent, Qt.Window)
+        QDialog.__init__(self, parent, Qt.WindowType.Window)
         self.dialog = first_run_import.Ui_Dialog()
         self.dialog.setupUi(self)
         ltext = ("This window is shown by the add-on 'anki pdf viewer (pdfjs)'.\n\nThis "
