@@ -37,6 +37,7 @@ from .config import gc
 
 from aqt import mw
 from aqt.qt import *
+from aqt.theme import theme_manager
 from aqt.utils import (
     restoreGeom,
     saveGeom,
@@ -63,6 +64,7 @@ class PdfJsViewer(QDialog):
             mw.setupDialogGC(self)
         else:
             mw.garbage_collect_on_dialog_finish(self)
+        self.parent = parent
         self.url = url
         self.setWindowTitle(win_title)
         restoreGeom(self, "319501851")
@@ -88,9 +90,56 @@ class PdfJsViewer(QDialog):
     def closeEvent(self, evnt):
         saveGeom(self, "319501851")
 
+    def toggle_to_dark_inverted(self):
+        # TODO
+        # look into "new preference, viewerCssTheme" from 2020-11,  https://github.com/mozilla/pdf.js/pull/12625
+
+
+        # basic solution from https://stackoverflow.com/questions/61814564/how-can-i-enable-dark-mode-when-viewing-a-pdf-file-in-firefox
+        # js_dark = """(function(){viewer.style = 'filter: grayscale(1) invert(1) sepia(1) contrast(75%)';})()"""
+        # an extended bookmarklet from 2020
+        js_dark = """
+javascript:(function(){
+viewer.style = 'filter: grayscale(1) invert(1) sepia(1) contrast(75%)';
+document.getRootNode().body.style.setProperty('--body-bg-color', 'Black');
+document.getElementById("pageNumber").style.setProperty('background-color', '#2c2c2c');
+document.getElementById("pageNumber").style.setProperty('color', '#afb0a4');
+document.getElementById("numPages").style.setProperty('background-color', '#2c2c2c');
+document.getElementById("numPages").style.setProperty('color', '#afb0a4');
+document.getElementById("scaleSelectContainer").style.setProperty('color', '#afb0a4');
+document.getElementById("scaleSelectContainer").style.setProperty('color', '#afb0a4');
+document.getElementById("toolbarViewer").style.setProperty('background-color', '#2c2c2c');
+document.getElementById("scaleSelect").style.setProperty('background-color', '#2c2c2c');
+document.getElementById("scaleSelect").style.setProperty('color', '#afb0a4');
+})()
+        """
+
+
+        '''
+        # new answer from 2022 from https://stackoverflow.com/a/71777470 doesn't help
+        js_dark = """
+(
+    function() {
+        if (viewer.classList.contains("dm")) viewer.style = "";
+        else viewer.style = "filter: grayscale(1) invert(1) sepia(1) contrast(75%)'";
+        viewer.classList.toggle("dm");
+    }
+)()
+"""
+'''
+        # suggested at https://github.com/mozilla/pdf.js/issues/2071#issuecomment-830446509
+        # js_dark = """(function(){viewer.style.filter = 'invert(64%) contrast(228%) brightness(80%) hue-rotate(180deg)';})()"""
+        self.web.page().runJavaScript(js_dark)
+
     def load_finished(self, success):
         if success:
             self.web.show()
+            if theme_manager.night_mode:
+                t = QTimer(self.parent)
+                t.timeout.connect(self.toggle_to_dark_inverted)  # type: ignore
+                t.setSingleShot(True)
+                t.start(1000)   
+
         else:
             tooltip('page failed to load')
 
