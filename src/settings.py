@@ -17,7 +17,11 @@ from aqt.utils import (
     showInfo,
 )
 from .config import gc
-from .forms import first_run_import  # noqa
+
+if qtmajor == 5:
+    from .forms5 import first_run_import  # noqa
+else:
+    from .forms6 import first_run_import  # noqa
 
 
 def MaybeSetPath():

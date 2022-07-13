@@ -7,9 +7,12 @@ from aqt.qt import *
 
 from .config import gc, pointversion
 if pointversion < 28:
-    from .forms import addtofield  # noqa
+    from .forms5 import addtofield  # noqa
 else:
-    from .forms import addtofield28 as addtofield  # noqa
+    if qtmajor == 5:
+        from .forms5 import addtofield28 as addtofield  # noqa
+    else:
+        from .forms6 import addtofield28 as addtofield  # noqa
 
 
 def my_setup_buttons(self):
