@@ -176,6 +176,8 @@ def open_pdf_in_internal_viewer_helper(file, page):
         open_pdf_in_internal_viewer__with_pdfjs(file, page)
     else:
         open_pdf_in_internal_viewer__with_chromium_pdf(file, page)
+mw.pdf_folder_path = gc("pdf_folder_paths")
+mw.open_pdf_in_internal_viewer_helper = open_pdf_in_internal_viewer_helper
 
 
 def basic_check_filefield(file, showinfos):
