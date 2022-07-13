@@ -1,4 +1,5 @@
 {
+    "apply night mode hacks to invert colors by default": true,
     "field_for_filename": "external_source",
     "field_for_page": "external_page",
     "pdf_folder_paths": "",

@@ -134,7 +134,7 @@ document.getElementById("scaleSelect").style.setProperty('color', '#afb0a4');
     def load_finished(self, success):
         if success:
             self.web.show()
-            if theme_manager.night_mode:
+            if theme_manager.night_mode and gc("apply night mode hacks to invert colors by default"):
                 t = QTimer(self.parent)
                 t.timeout.connect(self.toggle_to_dark_inverted)  # type: ignore
                 t.setSingleShot(True)
