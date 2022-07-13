@@ -30,7 +30,6 @@ from pprint import pprint as pp  # noqa
 
 from anki.hooks import addHook, wrap
 from anki.utils import (
-    pointVersion,
     stripHTML,
 )
 from .config import (
