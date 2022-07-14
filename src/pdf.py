@@ -226,7 +226,7 @@ def open_pdf_in_internal_viewer__with_chromium_pdf(file, page):
 def open_pdf_in_internal_viewer_helper(file, page):
     global handledfile
     handledfile = file
-    if gc("use pdfjs to show pdfs", False):
+    if anki_point_version <= 49 or qtmajor == 5 or gc("use pdfjs to show pdfs in Anki 2.1.50+ (with pyqt6)", False):
         open_pdf_in_internal_viewer__with_pdfjs(file, page)
     else:
         open_pdf_in_internal_viewer__with_chromium_pdf(file, page)

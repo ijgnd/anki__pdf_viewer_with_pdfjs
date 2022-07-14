@@ -6,5 +6,5 @@
     "open pdfs from other paths than the default path":  false,
     "show_first_run_message": true,
     "pdf_js_version_used": "latest",
-    "use pdfjs to show pdfs": true
+    "use pdfjs to show pdfs in Anki 2.1.50+ (with pyqt6)": false
 }
