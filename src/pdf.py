@@ -48,6 +48,8 @@ from aqt.previewer import Previewer
 from aqt.reviewer import Reviewer
 import aqt.mediasrv as mediasrv
 
+from .copied.helpers import check_string_for_existing_file
+
 
 addon_path = os.path.dirname(__file__)
 addonfoldername = os.path.basename(addon_path)
@@ -234,20 +236,8 @@ mw.pdf_folder_path = gc("pdf_folder_paths")
 mw.open_pdf_in_internal_viewer_helper = open_pdf_in_internal_viewer_helper
 
 
-def basic_check_filefield(file, showinfos):
-    targetfile = os.path.join(gc("pdf_folder_paths"), file)
-    if not os.path.isfile(targetfile):
-        nemsg = ("The file '%s' does not exist in the folder '%s'. Maybe "
-                 "the file is missing, maybe there's a typo or maybe "
-                 "there's too much else in the field '%s'. Aborting ..."
-                 "\nAlso see the description of the add-on "
-                 "''anki pdf viewer (pdfjs)' on ankiweb." % (
-                  file, gc("pdf_folder_paths"), gc("field_for_filename"))
-                 )
-        if showinfos:
-            showInfo(nemsg)
-        return
-    if file.startswith("file:/"):
+def basic_check_filefield(file_with_or_without, page, showinfos):
+    if file_with_or_without.startswith("file:/"):
         vmsg = ("illegal values in field '%s'. See description of the add-on "
                 "'anki pdf viewer (pdfjs)' on Ankiweb. Aborting..." % 
                 gc("field_for_filename", "")
@@ -255,15 +245,39 @@ def basic_check_filefield(file, showinfos):
         if showinfos:
             showInfo(vmsg)
         return
-    return True
+
+    # ugly workaround to guess file extension 
+    # - I use this approach because this means I can reuse code from 879473266 without changing it
+    # - I use this approach because this means no modification for users of their old hyperlink
+    #   code in their card templates is needed.
+    re_merged = f"""{gc("inline_prefix")}{file_with_or_without}{gc("inline_separator")}{page}"""
+    file_abs, page = check_string_for_existing_file(re_merged)
+
+    if not file_abs or not os.path.isfile(file_abs):
+        nemsg = ("The file '%s' does not exist in the folder '%s'. Maybe "
+                 "the file is missing, maybe there's a typo or maybe "
+                 "there's too much else in the field '%s'. Aborting ..."
+                 "\nAlso see the description of the add-on "
+                 "''anki pdf viewer (pdfjs)' on ankiweb." % (
+                  file_with_or_without, gc("pdf_folder_paths"), gc("field_for_filename"))
+                 )
+        if showinfos:
+            showInfo(nemsg)
+        return None, None
+
+    if file_abs:
+        just_filename = os.path.basename(file_abs)  # convert abs back to relative
+        return just_filename, page
+    return None, None
 
 
 def myLinkHandler(self, url, _old):
     if url.startswith("pdfjs319501851"):
-        file, page = url.replace("pdfjs319501851", "").split("319501851")
+        file_with_or_without, page = url.replace("pdfjs319501851", "").split("319501851")
         page = re.sub(r"\D", "", page)
-        if basic_check_filefield(file, True):
-            open_pdf_in_internal_viewer_helper(file, page)
+        file_rel_path_if_exists, page = basic_check_filefield(file_with_or_without, page, True)
+        if file_rel_path_if_exists:
+            open_pdf_in_internal_viewer_helper(file_rel_path_if_exists, page)
     else:    
         return _old(self, url)
 Reviewer._linkHandler = wrap(Reviewer._linkHandler, myLinkHandler, "around")
@@ -318,14 +332,15 @@ def myhelper(editor, menu):
     filefld = [f["ord"] for f in editor.note.model()['flds'] if f['name'] == gc("field_for_filename")]
     if not filefld:
         return
-    file = stripHTML(editor.note.fields[filefld[0]])
+    file_with_or_without = stripHTML(editor.note.fields[filefld[0]])
     pagefld = [f["ord"] for f in editor.note.model()['flds'] if f['name'] == gc("field_for_page")]
     page = ""
     if pagefld:
         page = stripHTML(editor.note.fields[pagefld[0]])
-    if basic_check_filefield(file, False):
+    file_rel_path_if_exists, page = basic_check_filefield(file_with_or_without, page, True)
+    if file_rel_path_if_exists:
         a = menu.addAction("open pdf")
-        a.triggered.connect(lambda _, f=file, p=page: open_pdf_in_internal_viewer_helper(f, p))
+        a.triggered.connect(lambda _, f=file_rel_path_if_exists, p=page: open_pdf_in_internal_viewer_helper(f, p))
 
 
 def add_to_context(view, menu):
