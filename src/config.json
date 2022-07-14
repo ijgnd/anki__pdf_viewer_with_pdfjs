@@ -3,6 +3,8 @@
     "inline modification enabled": true,
     "inline_prefix": "___",
     "inline_separator": "____",
+    "insert filenames without extension": true,
+    "insert into editor: surrounded by default": true,
     "field_for_filename": "external_source",
     "field_for_page": "external_page",
     "pdf_folder_paths": "",

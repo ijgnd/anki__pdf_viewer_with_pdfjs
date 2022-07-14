@@ -44,6 +44,7 @@ from aqt import mw
 from aqt.qt import *
 from aqt.utils import tooltip, restoreGeom, saveGeom
 
+from .config import gc
 
 class PanelInputLine(QLineEdit):
     down_pressed = pyqtSignal()
@@ -82,6 +83,7 @@ class FilterDialog(QDialog):
         else:
             self.dict = False
             self.keys = sorted(values)
+        self.surrounded = gc("insert into editor: surrounded by default")
         self.fuzzy_items = self.keys[:max_items]
         self.initUI()
         if prefill:
@@ -96,18 +98,23 @@ class FilterDialog(QDialog):
         self.vlay.addWidget(self.input_line)
         self.vlay.addWidget(self.list_box)
 
-        self.button_ok = QPushButton("&OK", self)
-        self.button_ok.clicked.connect(self.accept)
-        self.button_ok.setToolTip("Return")
+        self.button_ok_just_filename = QPushButton("&Insert just filename", self)
+        self.button_ok_just_filename.clicked.connect(self.accept_just_name)
+        self.button_ok_just_filename.setToolTip("Return")
         # self.button_ok.setAutoDefault(True)
         
+        self.button_ok_surrounded = QPushButton("Insert &filename, pre- and posfixed with underscores", self)
+        self.button_ok_surrounded.clicked.connect(self.accept_surrounded)
+        self.button_ok_surrounded.setToolTip("Return")
+
         self.button_cancel = QPushButton("&Cancel", self)
         self.button_cancel.clicked.connect(self.reject)
         self.button_cancel.setToolTip("Esc")
 
         self.bottombar = QHBoxLayout()
         self.bottombar.addStretch(1)
-        self.bottombar.addWidget(self.button_ok)
+        self.bottombar.addWidget(self.button_ok_surrounded)
+        self.bottombar.addWidget(self.button_ok_just_filename)
         self.bottombar.addWidget(self.button_cancel)
         
         self.vlay.addLayout(self.bottombar)
@@ -136,6 +143,14 @@ class FilterDialog(QDialog):
     def reject(self):
         saveGeom(self, "SHFork_fuzzy")
         QDialog.reject(self)
+
+    def accept_just_name(self):
+        self.surrounded = False
+        self.accept()
+
+    def accept_surrounded(self):
+        self.surrounded = True
+        self.accept()
 
     def accept(self):
         row = self.list_box.currentRow()

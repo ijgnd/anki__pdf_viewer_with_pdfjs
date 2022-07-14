@@ -25,15 +25,16 @@ from .helpers import (
 
 def insert_file_name_formatted(editor):
     _, filenames = get_all_relative(relative_only=True)
-    d = FilterDialog(parent=editor.parentWindow, values=filenames)
-    if d.exec():
-        file = d.selkey
+    dialog = FilterDialog(parent=editor.parentWindow, values=filenames)
+    if dialog.exec():
+        file = dialog.selkey
     else:
         return
     file_wo, _ = os.path.splitext(file)
     ins = file_wo if gc("insert filenames without extension") else file
-    fmted = gc("inline_prefix", "___") + ins + gc("inline_separator", "____")
-    editor.web.eval("setFormat('inserthtml', %s);" % json.dumps(fmted))
+    if dialog.surrounded:
+        ins = gc("inline_prefix", "___") + ins + gc("inline_separator", "____")
+    editor.web.eval("setFormat('inserthtml', %s);" % json.dumps(ins))
     if " " in file:
         tooltip("There's a space in file name inserted. This breaks <br>some functions of the add-on 'open linked pdfs'.")
 
