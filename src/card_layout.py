@@ -18,11 +18,11 @@ else:
 
 
 def my_setup_buttons(self):
-    on_ext_docs_but = QPushButton("Ext-Docs-Link")
+    on_ext_docs_but = QPushButton("PDF open from fields code")
     on_ext_docs_but.setAutoDefault(False)
     self.buttons.insertWidget(3, on_ext_docs_but)
     on_ext_docs_but.clicked.connect(self.on_ext_docs_link)
-    tm = ("This button belongs to the add-on 'anki pdf viewer (pdfjs)'."
+    tm = ("This button belongs to the add-on 'anki pdf viewer'."
           "For more info go to https://ankiweb.net/shared/info/319501851")
     on_ext_docs_but.setToolTip(tm)
 CardLayout.setupButtons = wrap(CardLayout.setupButtons, my_setup_buttons)  # noqa
@@ -33,12 +33,12 @@ def on_ext_docs_link(self):
     pagefield = gc("field_for_page", "external_page")
     fieldnames = [f['name'] for f in self.model['flds']]
     if filefield not in fieldnames or pagefield not in fieldnames:
-        msg = ("Your setup for the Add-on 'anki pdf viewer (pdfjs)' "
+        msg = ("Your setup for the Add-on 'anki pdf viewer' "
                "is not valid.\n\n"
-               "Your notetype doesn't contain fields with the names %s and %s"
-               "which you set in the config of this add-on. Either use one of the note"
+               "Your notetype doesn't contain fields with the names %s and %s "
+               "which you set in the config of this add-on. Either use one of the note "
                "types bundled with this add-on or add fields with these names to this note type.\n\n"
-               "If you don't know what I mean by 'add fields to your note type' watch"
+               "If you don't know what I mean by 'add fields to your note type' watch "
                "this video https://www.youtube.com/watch?v=JTKqd4nqsK0&feature=youtu.be&t=22" % (
                    filefield, pagefield
                ))
