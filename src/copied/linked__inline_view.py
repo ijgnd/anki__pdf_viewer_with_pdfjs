@@ -52,8 +52,8 @@ def ReviewerContextMenu(view, menu):
 
 
 def actually_transform(txt):
-    pattern = r"(%s)([^\s<]*)" % gc("inline_prefix", "___")
-    repl = """<a href='javascript:pycmd("%s\\1\\2");'>\\1\\2</a>""" % pycmd_string
+    pattern = r"(%s.*?%s\d{0,4})" % (gc("inline_prefix", "___"), gc("inline_separator", "____"))
+    repl = """<a href='javascript:pycmd("%s\\1");'>\\1</a>""" % pycmd_string
     txt = re.sub(pattern, repl, txt)
     return txt
 
