@@ -8,9 +8,6 @@ from aqt.qt import *
 from .anki_version_detection import anki_point_version
 from .config import gc
 
-if anki_point_version < 28:
-    from .forms5 import addtofield  # noqa
-else:
     if qtmajor == 5:
         from .forms5 import addtofield28 as addtofield  # noqa
     else:
