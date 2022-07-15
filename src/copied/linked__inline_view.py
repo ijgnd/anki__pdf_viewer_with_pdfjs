@@ -84,8 +84,8 @@ def on_profile_loaded():
         return
     if gc('context menu entries in reviewer', True):
         gui_hooks.webview_will_show_context_menu.append(ReviewerContextMenu)
-    if gc('context menu entries in editor', True):
-        gui_hooks.editor_will_show_context_menu.append(EditorContextMenu)
+    #if gc('context menu entries in editor', True):  # already in pdf.py
+    #    gui_hooks.editor_will_show_context_menu.append(EditorContextMenu)
     if gc("make inline prefixed clickable", True):
         gui_hooks.card_will_show.append(transform)
 gui_hooks.profile_did_open.append(on_profile_loaded)
