@@ -12,4 +12,10 @@ def gc(arg, fail=False):
         return out
 
 
+def wc(arg, val):
+    config = mw.addonManager.getConfig(__name__)
+    config[arg] = val
+    mw.addonManager.writeConfig(__name__, config)
+
+
 addon_path = os.path.dirname(__file__)

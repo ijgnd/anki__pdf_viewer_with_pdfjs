@@ -24,8 +24,8 @@ This add-on uses mozilla's pdfjs which uses a license other than AGPL3, see
 the comments on top of the files in the folder web/pdfjs.
 """
 
+import base64
 import os
-import re
 from pprint import pprint as pp  # noqa
 
 from anki.hooks import addHook, wrap
@@ -273,9 +273,9 @@ def basic_check_filefield(file_with_or_without, page, showinfos):
 
 def myLinkHandler(self, url, _old):
     if url.startswith("pdfjs319501851"):
-        file_with_or_without, page = url.replace("pdfjs319501851", "").split("319501851")
-        page = re.sub(r"\D", "", page)
-        file_rel_path_if_exists, page = basic_check_filefield(file_with_or_without, page, True)
+        file_with_or_without_encoded, page = url.replace("pdfjs319501851", "").split("319501851")
+        file_with_or_without_decoded = base64.b64decode(file_with_or_without_encoded).decode('utf-8')
+        file_rel_path_if_exists, page = basic_check_filefield(file_with_or_without_decoded, page, True)
         if file_rel_path_if_exists:
             open_pdf_in_internal_viewer_helper(file_rel_path_if_exists, page)
     else:    

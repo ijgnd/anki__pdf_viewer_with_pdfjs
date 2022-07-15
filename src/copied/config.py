@@ -14,4 +14,5 @@ def gc(arg, fail=False):
 
 addon_path = os.path.dirname(__file__)
 
-pycmd_string = "open_external_addon"
+pycmd_string = "pdfViewer_319501851_1"
+pycmd_string_editor = "pdfViewer_319501851_editor"

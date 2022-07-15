@@ -1,3 +1,4 @@
+import base64
 import re
 
 from anki.hooks import wrap
@@ -51,10 +52,15 @@ def ReviewerContextMenu(view, menu):
     contexthelper(menu, selectedtext)
 
 
+def my_replace(match):
+    match = match.group()
+    encoded = base64.urlsafe_b64encode(match.encode('utf-8')).decode("utf-8")
+    return f"""<a href='javascript:pycmd("{pycmd_string}{encoded}");'>{match}</a>"""
+
+
 def actually_transform(txt):
     pattern = r"(%s.*?%s\d{0,4})" % (gc("inline_prefix", "___"), gc("inline_separator", "____"))
-    repl = """<a href='javascript:pycmd("%s\\1");'>\\1</a>""" % pycmd_string
-    txt = re.sub(pattern, repl, txt)
+    txt = re.sub(pattern, my_replace, txt)
     return txt
 
 

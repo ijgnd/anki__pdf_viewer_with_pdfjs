@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>669</width>
-    <height>186</height>
+    <width>733</width>
+    <height>188</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,7 +27,7 @@
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="label_2">
+      <widget class="QLabel" name="label_font">
        <property name="text">
         <string>Font:</string>
        </property>
@@ -37,7 +37,7 @@
       <widget class="QLineEdit" name="linktext"/>
      </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="label_3">
+      <widget class="QLabel" name="label_size">
        <property name="text">
         <string>Size:</string>
        </property>
@@ -60,7 +60,7 @@
       </spacer>
      </item>
      <item row="0" column="0">
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="label_text">
        <property name="text">
         <string>Linktext</string>
        </property>

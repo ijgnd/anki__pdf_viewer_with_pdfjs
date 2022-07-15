@@ -4,7 +4,7 @@ from aqt.browser import Browser
 from aqt.editcurrent import EditCurrent
 from aqt.editor import Editor
 
-from .config import gc, pycmd_string
+from .config import gc, pycmd_string, pycmd_string_editor
 
 
 # NOTE: I can have all kinds of filenames and extensions after the inline_prefix. So it doesn't
@@ -14,10 +14,10 @@ def append_js_to_Editor(web_content, context):
     if not gc("inline_prefix"):
         return
     if not isinstance(context, Editor):
-        return    
+        return
     script_str = """
 <script>
-var external_prefix_regex = new RegExp("PREFIX[^\s]+");
+var external_prefix_regex = new RegExp("PREFIX.*?POSTFIX\d{0,4}");
 window.addEventListener('dblclick', function (e) {
     const st = window.getSelection().toString();
     if (st != ""){
@@ -28,6 +28,7 @@ window.addEventListener('dblclick', function (e) {
 });
 </script>
 """.replace("PREFIX", gc("inline_prefix"))\
-   .replace("PYCMD_STRING", pycmd_string)
+   .replace("POSTFIX", gc("inline_separator"))\
+   .replace("PYCMD_STRING", pycmd_string_editor)
     web_content.head += script_str
 gui_hooks.webview_will_set_content.append(append_js_to_Editor)
