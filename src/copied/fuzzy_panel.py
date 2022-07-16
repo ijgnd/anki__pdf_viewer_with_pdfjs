@@ -70,11 +70,13 @@ class PanelInputLine(QLineEdit):
 
 
 class FilterDialog(QDialog):
-    def __init__(self, parent=None, values=None, windowtitle="", max_items=2000, prefill=""):
+    def __init__(self, parent=None, values=None, inline_allowed=True, windowtitle="", max_items=2000, prefill=""):
         super().__init__(parent)
         self.parent = parent
         self.max_items = max_items
+        self.inline_allowed = inline_allowed
         self.setObjectName("FilterDialog")
+        self.surrounded = gc("insert into editor: surrounded by default") and self.inline_allowed
         if windowtitle:
             self.setWindowTitle(windowtitle)
         if isinstance(values, dict):
@@ -83,7 +85,6 @@ class FilterDialog(QDialog):
         else:
             self.dict = False
             self.keys = sorted(values)
-        self.surrounded = gc("insert into editor: surrounded by default")
         self.fuzzy_items = self.keys[:max_items]
         self.initUI()
         if prefill:
@@ -101,11 +102,15 @@ class FilterDialog(QDialog):
         self.button_ok_just_filename = QPushButton("&Insert just filename", self)
         self.button_ok_just_filename.clicked.connect(self.accept_just_name)
         self.button_ok_just_filename.setToolTip("Return")
+        self.button_ok_just_filename.setFocus()
         # self.button_ok.setAutoDefault(True)
         
-        self.button_ok_surrounded = QPushButton("Insert &filename, pre- and posfixed with underscores", self)
-        self.button_ok_surrounded.clicked.connect(self.accept_surrounded)
-        self.button_ok_surrounded.setToolTip("Return")
+        if self.inline_allowed:
+            self.button_ok_surrounded = QPushButton("Insert &filename, pre- and posfixed with underscores", self)
+            self.button_ok_surrounded.clicked.connect(self.accept_surrounded)
+            self.button_ok_surrounded.setToolTip("Return")
+            if gc("insert into editor: surrounded by default"):
+                self.button_ok_surrounded.setFocus()
 
         self.button_cancel = QPushButton("&Cancel", self)
         self.button_cancel.clicked.connect(self.reject)
@@ -113,7 +118,8 @@ class FilterDialog(QDialog):
 
         self.bottombar = QHBoxLayout()
         self.bottombar.addStretch(1)
-        self.bottombar.addWidget(self.button_ok_surrounded)
+        if self.inline_allowed:
+            self.bottombar.addWidget(self.button_ok_surrounded)
         self.bottombar.addWidget(self.button_ok_just_filename)
         self.bottombar.addWidget(self.button_cancel)
         

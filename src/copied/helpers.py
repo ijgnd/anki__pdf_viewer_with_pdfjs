@@ -15,8 +15,12 @@ def check_string_for_existing_file(selectedtext):
         return None, None
     sel_wo = selectedtext.replace(prefix, "", 1)  # only replace first occurence, not all
     sep = gc("inline_separator")
-    if sep and sep in sel_wo:
-        file, page = sel_wo.split(sep) 
+    if sep and sep in sel_wo and not sel_wo.endswith(sep):
+        try:
+            file, page = sel_wo.split(sep) 
+        except:
+            file = sel_wo
+            page = ""
     else:
         file = sel_wo
         page = ""

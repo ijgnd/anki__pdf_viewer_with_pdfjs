@@ -202,7 +202,7 @@ class ChromiumPdfViewerWindow(QDialog):
 handledfile = None
 
 
-def open_pdf_in_internal_viewer__with_pdfjs(file, page):
+def open_pdf_in_internal_viewer__with_pdfjs(parent, file, page):
     fmt = f"?file=/_pdfjspath/{file}#page={page}"
     win_title = 'Anki - pdf viewer'
     port = mw.mediaServer.getPort()
@@ -212,26 +212,29 @@ def open_pdf_in_internal_viewer__with_pdfjs(file, page):
         # the regular version from https://github.com/mozilla/pdf.js/releases/download/v2.14.305/pdfjs-2.14.305-dist.zip
         # does not work with anki 2.1.49 in 2022-07-13
         url = f"http://127.0.0.1:{port}/_addons/{addonfoldername}/web/pdfjs_2022-05-14__v2.14.305_legacy/web/viewer.html{fmt}"
-    d = PdfJsViewer(mw, url, win_title)
+    d = PdfJsViewer(parent, url, win_title)
     d.show()
 
 
-def open_pdf_in_internal_viewer__with_chromium_pdf(file, page):
+def open_pdf_in_internal_viewer__with_chromium_pdf(parent, file, page):
     win_title = 'Anki - pdf viewer'
     port = mw.mediaServer.getPort()
     # url = f"{file}#page={page}"  # for pdfs in the media folder
     url = f"http://127.0.0.1:{port}/_pdfjspath/{file}#page={page}"
-    d = ChromiumPdfViewerWindow(mw, url, win_title)
+    d = ChromiumPdfViewerWindow(parent, url, win_title)
     d.show()
 
 
-def open_pdf_in_internal_viewer_helper(file, page):
+def open_pdf_in_internal_viewer_helper(parent, file, page, not_exist_warning=None):
     global handledfile
+    if not_exist_warning:
+        showInfo(not_exist_warning)
+        return
     handledfile = file
     if anki_point_version <= 49 or qtmajor == 5 or gc("use pdfjs to show pdfs in Anki 2.1.50+ (with pyqt6)", False):
-        open_pdf_in_internal_viewer__with_pdfjs(file, page)
+        open_pdf_in_internal_viewer__with_pdfjs(parent, file, page)
     else:
-        open_pdf_in_internal_viewer__with_chromium_pdf(file, page)
+        open_pdf_in_internal_viewer__with_chromium_pdf(parent, file, page)
 mw.pdf_folder_path = gc("pdf_folder_paths")
 mw.open_pdf_in_internal_viewer_helper = open_pdf_in_internal_viewer_helper
 
@@ -244,7 +247,7 @@ def basic_check_filefield(file_with_or_without, page, showinfos):
                 )
         if showinfos:
             showInfo(vmsg)
-        return
+        return None, None, None
 
     # ugly workaround to guess file extension 
     # - I use this approach because this means I can reuse code from 879473266 without changing it
@@ -263,25 +266,33 @@ def basic_check_filefield(file_with_or_without, page, showinfos):
                  )
         if showinfos:
             showInfo(nemsg)
-        return None, None
+        return None, None, nemsg
 
     if file_abs:
         just_filename = os.path.basename(file_abs)  # convert abs back to relative
-        return just_filename, page
-    return None, None
+        return just_filename, page, None
+    return None, None, None
 
 
-def myLinkHandler(self, url, _old):
+def myLinkHandler(self, parent, url, _old):
     if url.startswith("pdfjs319501851"):
         file_with_or_without_encoded, page = url.replace("pdfjs319501851", "").split("319501851")
         file_with_or_without_decoded = base64.b64decode(file_with_or_without_encoded).decode('utf-8')
-        file_rel_path_if_exists, page = basic_check_filefield(file_with_or_without_decoded, page, True)
+        file_rel_path_if_exists, page, does_not_exist_show_warning = basic_check_filefield(file_with_or_without_decoded, page, True)
         if file_rel_path_if_exists:
-            open_pdf_in_internal_viewer_helper(file_rel_path_if_exists, page)
+            open_pdf_in_internal_viewer_helper(parent, file_rel_path_if_exists, page)
     else:    
         return _old(self, url)
-Reviewer._linkHandler = wrap(Reviewer._linkHandler, myLinkHandler, "around")
-Previewer._on_bridge_cmd = wrap(Previewer._on_bridge_cmd, myLinkHandler, "around")
+
+
+def myLinkHandler_reviewer(self, url, _old):
+    myLinkHandler(self, mw, url, _old)
+Reviewer._linkHandler = wrap(Reviewer._linkHandler, myLinkHandler_reviewer, "around")
+
+
+def myLinkHandler_previewer(self, url, _old):
+    myLinkHandler(self, self, url, _old)
+Previewer._on_bridge_cmd = wrap(Previewer._on_bridge_cmd, myLinkHandler_previewer, "around")
 
 
 if anki_point_version <= 49:
@@ -328,7 +339,7 @@ if anki_point_version >= 50:
                                                 _extract_pdf_request, 'around')
 
 
-def myhelper(editor, menu):
+def my_helper(editor, menu):
     filefld = [f["ord"] for f in editor.note.model()['flds'] if f['name'] == gc("field_for_filename")]
     if not filefld:
         return
@@ -337,17 +348,17 @@ def myhelper(editor, menu):
     page = ""
     if pagefld:
         page = stripHTML(editor.note.fields[pagefld[0]])
-    file_rel_path_if_exists, page = basic_check_filefield(file_with_or_without, page, True)
+    file_rel_path_if_exists, page, does_not_exist_show_warning = basic_check_filefield(file_with_or_without, page, False)
     if file_rel_path_if_exists:
         a = menu.addAction("open pdf")
-        a.triggered.connect(lambda _, f=file_rel_path_if_exists, p=page: open_pdf_in_internal_viewer_helper(f, p))
+        a.triggered.connect(lambda _, pw=editor.parentWindow, f=file_rel_path_if_exists, pa=page, m=does_not_exist_show_warning: open_pdf_in_internal_viewer_helper(pw,f,pa, m))
 
 
 def add_to_context(view, menu):
     e = view.editor
     field = e.currentField
     if field:
-        e.saveNow(lambda ed=e, m=menu: myhelper(ed, m))
+        e.saveNow(lambda ed=e, m=menu: my_helper(ed, m))
     else:
-        myhelper(e, menu)
+        my_helper(e, menu)
 addHook("EditorWebView.contextMenuEvent", add_to_context)  # noqa

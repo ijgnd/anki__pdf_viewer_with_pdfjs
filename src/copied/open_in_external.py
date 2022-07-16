@@ -7,7 +7,7 @@ import os
 
 from aqt import mw
 
-def open_external(file, page):
+def open_external(parent, file, page):
     if mw.pdf_folder_path in file and file.endswith("pdf"):
         filename = os.path.basename(file)
-        mw.open_pdf_in_internal_viewer_helper(filename, page)
+        mw.open_pdf_in_internal_viewer_helper(parent, filename, page)

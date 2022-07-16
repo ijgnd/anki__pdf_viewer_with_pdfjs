@@ -18,17 +18,30 @@ from .open_in_external import open_external
 
 
 
-def myLinkHandler(self, url, _old):
-    if process_urlcmd(url):
+def myLinkHandler_reviewer(self, url, _old):
+    if process_urlcmd(mw, url):
         return
     else:
         return _old(self, url)
-Reviewer._linkHandler = wrap(Reviewer._linkHandler, myLinkHandler, "around")
-Previewer._on_bridge_cmd = wrap(Previewer._on_bridge_cmd, myLinkHandler, "around")
-Editor.onBridgeCmd = wrap(Editor.onBridgeCmd, myLinkHandler, "around")
+Reviewer._linkHandler = wrap(Reviewer._linkHandler, myLinkHandler_reviewer, "around")
+
+def myLinkHandler_previewer(self, url, _old):
+    if process_urlcmd(self, url):
+        return
+    else:
+        return _old(self, url)
+Previewer._on_bridge_cmd = wrap(Previewer._on_bridge_cmd, myLinkHandler_previewer, "around")
 
 
-def contexthelper(menu, selectedtext):
+def myLinkHandler_editor(self, url, _old):
+    if process_urlcmd(self.parentWindow, url):
+        return
+    else:
+        return _old(self, url)
+Editor.onBridgeCmd = wrap(Editor.onBridgeCmd, myLinkHandler_editor, "around")
+
+
+def contexthelper(menu, parent, selectedtext):
     if not gc("inline_prefix"):
         return
     if not gc("inline_prefix") in selectedtext:
@@ -37,19 +50,19 @@ def contexthelper(menu, selectedtext):
     # print(f"file_add_to_context: {file}, {page}")
     if file:
         a = menu.addAction("Try to open externally")
-        a.triggered.connect(lambda _, f=file, p=page: open_external(f, p))
+        a.triggered.connect(lambda _, p=parent, f=file, pg=page: open_external(p, f, pg))
 
 
 def EditorContextMenu(view, menu):
     selectedtext = view.editor.web.selectedText()
-    contexthelper(menu, selectedtext)
+    contexthelper(menu, view.editor.parentWindow, selectedtext)
 
 
 def ReviewerContextMenu(view, menu):
     if mw.state != "review":
         return
     selectedtext = view.page().selectedText()
-    contexthelper(menu, selectedtext)
+    contexthelper(menu, mw, selectedtext)
 
 
 def my_replace(match):
@@ -90,8 +103,8 @@ def on_profile_loaded():
         return
     if gc('context menu entries in reviewer', True):
         gui_hooks.webview_will_show_context_menu.append(ReviewerContextMenu)
-    #if gc('context menu entries in editor', True):  # already in pdf.py
-    #    gui_hooks.editor_will_show_context_menu.append(EditorContextMenu)
+    if gc('context menu entries in editor', True):  # already in pdf.py
+        gui_hooks.editor_will_show_context_menu.append(EditorContextMenu)
     if gc("make inline prefixed clickable", True):
         gui_hooks.card_will_show.append(transform)
 gui_hooks.profile_did_open.append(on_profile_loaded)

@@ -24,8 +24,20 @@ from .helpers import (
 
 
 def insert_file_name_formatted(editor):
+    if editor.currentField is None:
+        tooltip("No field selected. Aborting ...")
+        return
+    inline_allowed = True
+    for idx, fname in enumerate(editor.note.keys()):
+        if idx == editor.currentField:
+            if fname == gc("field_for_filename"):
+                inline_allowed = False
     _, filenames = get_all_relative(relative_only=True)
-    dialog = FilterDialog(parent=editor.parentWindow, values=filenames)
+    dialog = FilterDialog(parent=editor.parentWindow, 
+                          values=filenames,
+                          inline_allowed=inline_allowed,
+                          windowtitle="select filename to insert"
+                        )
     if dialog.exec():
         file = dialog.selkey
     else:
@@ -35,8 +47,6 @@ def insert_file_name_formatted(editor):
     if dialog.surrounded:
         ins = gc("inline_prefix", "___") + ins + gc("inline_separator", "____")
     editor.web.eval("setFormat('inserthtml', %s);" % json.dumps(ins))
-    if " " in file:
-        tooltip("There's a space in file name inserted. This breaks <br>some functions of the add-on 'open linked pdfs'.")
 
 
 def keystr(k):
