@@ -4338,7 +4338,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
 
-var DEFAULT_SCALE_VALUE = "auto";
+var DEFAULT_SCALE_VALUE = "page-width";
 exports.DEFAULT_SCALE_VALUE = DEFAULT_SCALE_VALUE;
 var DEFAULT_SCALE = 1.0;
 exports.DEFAULT_SCALE = DEFAULT_SCALE;
