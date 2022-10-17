@@ -24,6 +24,11 @@ This add-on uses mozilla's pdfjs which uses a license other than AGPL3, see
 the comments on top of the files in the folder web/pdfjs.
 """
 
+# in 2022 only the pdfjs legacy version works. This is confirmed by  
+# https://stackoverflow.com/a/48053017 that states:
+# "as of Aug 2022, it may be necessary to use the legacy build of pdfjs to 
+# keep things working with PyQt5. The stable build should work okay with PyQt6, though."
+
 import base64
 import os
 from pprint import pprint as pp  # noqa
