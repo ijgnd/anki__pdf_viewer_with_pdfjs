@@ -1,9 +1,5 @@
 see the description on https://ankiweb.net/shared/info/319501851.
 
-If the pdf file is not shown you might want to use the pdfjs version that was bundled 
-as the default between 2021-05 and 2022-07. To do this change the setting 
-`"pdf_js_version_used"` to `"mid_2021"`.
-
 This add-on includes a hack so that in pdfjs the colors of the pdf and the 
 surrounding toolbar can be inverted (night mode). This has multiple flaws
 but I still use it because I really dislike looking at a bright white pdf
@@ -94,3 +90,5 @@ Redistribution and use in source and binary forms, with or without modification,
     Neither the name of {{{project}}} nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+

@@ -211,12 +211,7 @@ def open_pdf_in_internal_viewer__with_pdfjs(parent, file, page):
     fmt = f"?file=/_pdfjspath/{file}#page={page}"
     win_title = 'Anki - pdf viewer'
     port = mw.mediaServer.getPort()
-    if gc("pdf_js_version_used") == "mid_2021":
-        url = f"http://127.0.0.1:{port}/_addons/{addonfoldername}/web/pdfjs_mid_2021/web/viewer.html{fmt}"
-    else:
-        # the regular version from https://github.com/mozilla/pdf.js/releases/download/v2.14.305/pdfjs-2.14.305-dist.zip
-        # does not work with anki 2.1.49 in 2022-07-13
-        url = f"http://127.0.0.1:{port}/_addons/{addonfoldername}/web/pdfjs_2022-05-14__v2.14.305_legacy/web/viewer.html{fmt}"
+    url = f"http://127.0.0.1:{port}/_addons/{addonfoldername}/web/pdfjs_legacy/web/viewer.html{fmt}"
     d = PdfJsViewer(parent, url, win_title)
     d.show()
 
