@@ -1,18 +1,8 @@
 see the description on https://ankiweb.net/shared/info/319501851.
 
-This add-on includes a hack so that in pdfjs the colors of the pdf and the 
-surrounding toolbar can be inverted (night mode). This has multiple flaws
-but I still use it because I really dislike looking at a bright white pdf
-at night. You can enable it by setting 
-`"apply night mode hacks to invert colors by default"` to `true`.
+This add-on includes a hack so that in pdfjs the colors of the pdf and the surrounding toolbar can be inverted (night mode). This has multiple flaws but I still use it because I really dislike looking at a bright white pdf at night. You can enable it by setting  `"apply night mode hacks to invert colors by default"` to `true`.
 
-The underlying toolkit that Anki uses bundles a pdf viewer since around
-Anki 2.1.35 (well after the first version of my add-on was released). The 
-problem with this bundled pdf viewer is that - unless you are on the 
-latest anki builds with pyqt6 - a pdf is always opened on page 1. So 
-I only default to this built-in viewer if you use on Anki 2.1.50 with pyqt6. 
-If you still want to use pdfjs in these new versions change the setting 
-`"use pdfjs to show pdfs in Anki 2.1.50+ (with pyqt6)"` to `false`.
+The underlying toolkit that Anki uses bundles a pdf viewer since around Anki 2.1.35 (well after the first version of my add-on was released). The problem with this bundled pdf viewer is that - unless you are on the latest anki builds with pyqt6 - a pdf is always opened on page 1. So I only default to this built-in viewer if you use on Anki 2.1.50 with pyqt6. If you still want to use pdfjs in these new versions change the setting `"use pdfjs to show pdfs in Anki 2.1.50+ (with pyqt6)"` to `false`.
 
 &nbsp;
 &nbsp;
@@ -83,12 +73,10 @@ Copyright (c) 2014, Dan Kogai All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
-    Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 
-    Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
 
-    Neither the name of {{{project}}} nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+Neither the name of {{{project}}} nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-
