@@ -202,6 +202,31 @@ class ChromiumPdfViewerWindow(QDialog):
         t.setSingleShot(True)
         t.start(1000)   
         self.go_to_page()
+        #self.invert_colors()
+
+    def invert_colors(self):
+        # see https://superuser.com/a/1527417
+        # the original code by the user Wasif is CC BY-SA 4.0
+        # this code is modified.
+        # doesn't help because the pdfium elements like the sidebar or background
+        # are still grey.
+        js = """
+const overlay = document.createElement("div");
+const css = `
+    position: fixed;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+    mix-blend-mode: difference;
+    z-index: 1;
+`
+overlay.setAttribute("style", css);
+document.body.appendChild(overlay);
+"""
+        self.webview.page().runJavaScript(js)
 
 
 handledfile = None
