@@ -294,6 +294,8 @@ class ChromiumPdfViewerWindow(QDialog):
         t.setSingleShot(True)
         t.start(1000)   
         self.go_to_page()
+        if gc("chromium pdf viewer (2.1.50/qt6+ only): invert color hack", None):
+            self.invert_page_color()
 
     def reject(self):
         saveGeom(self, "319501851chromium")
@@ -302,6 +304,24 @@ class ChromiumPdfViewerWindow(QDialog):
     def closeEvent(self, evnt):
         saveGeom(self, "319501851chromium")
 
+    def invert_page_color(self):
+        # see https://superuser.com/a/1527417 by the user Wasif is CC BY-SA 4.0
+        # this snippet is widely posted.
+        # In 2022-10 this has the same result for me as the short
+        #    document.querySelector('embed').style.filter = 'invert()'
+        # I got the shortes snippet from
+        # https://www.reddit.com/r/edge/comments/h9k5vb/comment/fvb28ze/?utm_source=share&utm_medium=web2x&context=3
+        #
+        # the problem is that both snippets invert all colors - not just the pdf page as I want
+        # but it also turns the dark elements bright - the opposite of what I want.
+        #
+        # The chrome extension DarkReader has the same shortcoming as the inversion code.
+        # So in 2022-10 there's probably no real solution.
+        # TODO
+        js = """
+document.querySelector('embed').style.filter = 'invert()'
+"""
+        # self.webview.page().runJavaScript(js)
 
 
 handledfile = None
