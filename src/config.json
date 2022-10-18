@@ -10,7 +10,7 @@
     "night mode adjustment delay in ms": 1000,
     "pdf_folder_paths": "",
     "open pdfs from other paths than the default path":  false,
-    "set no parent for pdf dialog": true,
+    "set no parent for pdfjs dialog": false,
     "show_first_run_message": true,
     "update_messages_shown": [],
     "use pdfjs to show pdfs in Anki 2.1.50+ (with pyqt6)": true

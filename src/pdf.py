@@ -302,7 +302,7 @@ handledfile = None
 
 
 def parent_to_use(parent):
-    if gc("set no parent for pdf dialog", False):
+    if gc("set no parent for pdfjs dialog", False):
         return None
     else:
         return parent
@@ -325,7 +325,8 @@ def open_pdf_in_internal_viewer__with_chromium_pdf(parent, file, page):
     port = mw.mediaServer.getPort()
     # url = f"{file}#page={page}"  # for pdfs in the media folder
     url = f"http://127.0.0.1:{port}/_pdfjspath/{file}#page={page}"
-    d = ChromiumPdfViewerWindow(parent_to_use(parent), url, win_title)
+    # parent=None means the window is closed immediately (in contrast to the pdfjs dialog)
+    d = ChromiumPdfViewerWindow(parent, url, win_title)
     d.show()
 
 
