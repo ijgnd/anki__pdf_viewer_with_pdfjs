@@ -178,6 +178,7 @@ class PdfJsViewer(QDialog):
         self.url = url
         self.fname = fname
         self.setWindowTitle(win_title)
+        self.resize(500, 500)
         restoreGeom(self, "319501851")
         mainLayout = QVBoxLayout()
         mainLayout.setContentsMargins(0, 0, 0, 0)
