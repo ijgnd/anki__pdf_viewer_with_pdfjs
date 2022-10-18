@@ -44,6 +44,8 @@ else:
 
 import aqt
 from aqt import mw
+if anki_point_version >= 55:
+    from aqt import colors
 from aqt.qt import *
 from aqt.theme import theme_manager
 from aqt.utils import (
@@ -99,6 +101,7 @@ class WebViewForPdfjs(QWebEngineView):
         QWebEngineView.__init__(self, parent=parent)
         self.parent = parent
         self._page = MyAnkiWebPage(self._onBridgeCmd)
+        self._page.setBackgroundColor(QColor("#2f2f31") if anki_point_version <= 54 else theme_manager.qcolor(colors.CANVAS))
         self.new_cb_text = ""
         self.setPage(self._page)
 
@@ -216,13 +219,16 @@ class PdfJsViewer(QDialog):
 javascript:(function(){
 viewer.style = 'filter: grayscale(1) invert(1) sepia(1) contrast(75%)';
 })()
-PDFViewerApplicationOptions.set('viewerCssTheme', 2);
-PDFViewerApplication._forceCssTheme();
 """
         self.web.page().runJavaScript(js_dark)
 
     def load_finished(self, success):
         if success:
+            js_dark_theme = """
+PDFViewerApplicationOptions.set('viewerCssTheme', 2);
+PDFViewerApplication._forceCssTheme();
+"""
+            # self.web.page().runJavaScript(js_dark_theme)  # modify pdfjs directly to avoid white flicker
             self.web.show()
             if theme_manager.night_mode and gc("apply night mode hacks to invert colors by default"):
                 t = QTimer(mw)
