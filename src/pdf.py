@@ -200,6 +200,7 @@ class PdfJsViewer(QDialog):
     def toggle_to_dark_inverted(self):
         # TODO
         # look into "new preference, viewerCssTheme" from 2020-11,  https://github.com/mozilla/pdf.js/pull/12625
+        # also see https://stackoverflow.com/questions/73390781/properly-switch-to-dark-theme-in-pdf-js-rendered-inside-a-qwebview
 
 
         # basic solution from https://stackoverflow.com/questions/61814564/how-can-i-enable-dark-mode-when-viewing-a-pdf-file-in-firefox
