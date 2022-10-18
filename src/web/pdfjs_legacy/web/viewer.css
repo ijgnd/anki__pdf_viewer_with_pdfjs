@@ -2989,3 +2989,16 @@ dialog :link {
     display: none;
   }
 }
+
+
+#viewerContainer::-webkit-scrollbar {
+  width: 11px;
+}
+
+#viewerContainer::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-color)
+}
+
+#viewerContainer::-webkit-scrollbar-track {
+  background: var(--scrollbar-bg-color);
+}

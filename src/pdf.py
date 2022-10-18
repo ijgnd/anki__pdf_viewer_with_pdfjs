@@ -203,7 +203,10 @@ class PdfJsViewer(QDialog):
         # also see https://stackoverflow.com/questions/73390781/properly-switch-to-dark-theme-in-pdf-js-rendered-inside-a-qwebview
         # about applying the theme: https://github.com/mozilla/pdf.js/issues/14059#issuecomment-1002790116
         # viewerCssTheme does not affect the color of the scrollbars and the background color of the pdf file 
-        # the scrollbar colors are TODO
+        
+        # the scrollbar color can be fixed by adding some css to viewer.css, see
+        # https://stackoverflow.com/questions/73390781/properly-switch-to-dark-theme-in-pdf-js-rendered-inside-a-qwebview#73426867
+
         # about the page color: invert them with https://stackoverflow.com/questions/61814564/how-can-i-enable-dark-mode-when-viewing-a-pdf-file-in-firefox
         # js_dark = """(function(){viewer.style = 'filter: grayscale(1) invert(1) sepia(1) contrast(75%)';})()"""
         js_dark = """
