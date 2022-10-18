@@ -4,19 +4,20 @@ import os
 import re
 from pprint import pprint as pp  # noqa
 
+from .anki_version_detection import anki_point_version
+from .config import gc
+
 from anki.hooks import addHook
-from anki.utils import (
-    isLin,
-    isMac,
-    isWin,
-    pointVersion,
-)
+if anki_point_version <= 49:
+    from anki.utils import isMac, isWin
+else:
+    from anki.utils import is_mac as isMac
+    from anki.utils import is_win as isWin
 from aqt import mw
 from aqt.qt import *
 from aqt.utils import (
     showInfo,
 )
-from .config import gc
 
 if qtmajor == 5:
     from .forms5 import first_run_import  # noqa
@@ -125,7 +126,7 @@ class SelectNoteImport(QDialog):
 
 def MaybeAddModels():
     config = mw.addonManager.getConfig(__name__.split(".")[0])
-    if config.get("show_first_run_message", True) and pointVersion() < 45:
+    if config.get("show_first_run_message", True) and anki_point_version < 45:
         config["show_first_run_message"] = False
         mw.addonManager.writeConfig(__name__.split(".")[0], config)
         d = SelectNoteImport()

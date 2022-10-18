@@ -33,12 +33,14 @@ import base64
 import os
 from pprint import pprint as pp  # noqa
 
-from anki.hooks import addHook, wrap
-from anki.utils import (
-    stripHTML,
-)
 from .anki_version_detection import anki_point_version
 from .config import gc
+
+from anki.hooks import addHook, wrap
+if anki_point_version <= 49:
+    from anki.utils import stripHTML
+else:
+    from anki.utils import strip_html as stripHTML
 
 import aqt
 from aqt import mw
