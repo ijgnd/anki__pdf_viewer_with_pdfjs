@@ -288,7 +288,10 @@ def open_pdf_in_internal_viewer__with_pdfjs(parent, file, page):
     fmt = f"?file=/_pdfjspath/{file}#page={page}"
     win_title = 'Anki - pdf viewer'
     port = mw.mediaServer.getPort()
-    url = f"http://127.0.0.1:{port}/_addons/{addonfoldername}/web/pdfjs_legacy/web/viewer.html{fmt}"
+    if qtmajor == 6:
+        url = f"http://127.0.0.1:{port}/_addons/{addonfoldername}/web/pdfjs/web/viewer.html{fmt}"
+    else:
+        url = f"http://127.0.0.1:{port}/_addons/{addonfoldername}/web/pdfjs_legacy/web/viewer.html{fmt}"
     d = PdfJsViewer(parent, url, file, win_title)
     d.show()
 
