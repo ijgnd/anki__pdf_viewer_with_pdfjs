@@ -1,5 +1,5 @@
 {
-    "apply night mode hacks to invert colors by default": false,
+    "apply night mode hacks to invert colors by default": true,
     "inline modification enabled": true,
     "inline_prefix": "___",
     "inline_separator": "____",
@@ -11,5 +11,5 @@
     "open pdfs from other paths than the default path":  false,
     "show_first_run_message": true,
     "update_messages_shown": [],
-    "use pdfjs to show pdfs in Anki 2.1.50+ (with pyqt6)": false
+    "use pdfjs to show pdfs in Anki 2.1.50+ (with pyqt6)": true
 }
