@@ -134,7 +134,7 @@ class WebViewForPdfjs(QWebEngineView):
 
     def onCopyWithReference(self):
         self.onCopy()
-        t = QTimer(self.parent)
+        t = QTimer(mw)
         t.timeout.connect(self.afterCopyWithReference)  # type: ignore
         t.setSingleShot(True)
         t.start(100)   
@@ -222,7 +222,7 @@ PDFViewerApplication._forceCssTheme();
         if success:
             self.web.show()
             if theme_manager.night_mode and gc("apply night mode hacks to invert colors by default"):
-                t = QTimer(self.parent)
+                t = QTimer(mw)
                 t.timeout.connect(self.toggle_to_dark_inverted)  # type: ignore
                 t.setSingleShot(True)
                 t.start(gc("night mode adjustment delay in ms", 1000))   
@@ -277,7 +277,7 @@ class ChromiumPdfViewerWindow(QDialog):
     
     def load_finished(self):
         # if success and self.page_num:
-        t = QTimer(self.parent)
+        t = QTimer(mw)
         t.timeout.connect(self.go_to_page)  # type: ignore
         t.setSingleShot(True)
         t.start(1000)   
@@ -285,6 +285,13 @@ class ChromiumPdfViewerWindow(QDialog):
 
 
 handledfile = None
+
+
+def parent_to_use(parent):
+    if gc("set no parent for pdf dialog", False):
+        return None
+    else:
+        return parent
 
 
 def open_pdf_in_internal_viewer__with_pdfjs(parent, file, page):
@@ -295,7 +302,7 @@ def open_pdf_in_internal_viewer__with_pdfjs(parent, file, page):
         url = f"http://127.0.0.1:{port}/_addons/{addonfoldername}/web/pdfjs/web/viewer.html{fmt}"
     else:
         url = f"http://127.0.0.1:{port}/_addons/{addonfoldername}/web/pdfjs_legacy/web/viewer.html{fmt}"
-    d = PdfJsViewer(parent, url, file, win_title)
+    d = PdfJsViewer(parent_to_use(parent), url, file, win_title)
     d.show()
 
 
@@ -304,7 +311,7 @@ def open_pdf_in_internal_viewer__with_chromium_pdf(parent, file, page):
     port = mw.mediaServer.getPort()
     # url = f"{file}#page={page}"  # for pdfs in the media folder
     url = f"http://127.0.0.1:{port}/_pdfjspath/{file}#page={page}"
-    d = ChromiumPdfViewerWindow(parent, url, win_title)
+    d = ChromiumPdfViewerWindow(parent_to_use(parent), url, win_title)
     d.show()
 
 
