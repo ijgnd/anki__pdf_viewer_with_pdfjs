@@ -243,7 +243,7 @@ class ChromiumPdfViewerWindow(QDialog):
         mainLayout.setContentsMargins(0, 0, 0, 0)
         mainLayout.setSpacing(0)
         self.setLayout(mainLayout)
-        self.setGeometry(0, 28, 1000, 750)
+        self.setGeometry(0, 28, 650, 450)
         restoreGeom(self, "319501851chromium")
         self.webview = QWebEngineView()
         self.webview.settings().setAttribute(QWebEngineSettings.WebAttribute.PluginsEnabled, True)
