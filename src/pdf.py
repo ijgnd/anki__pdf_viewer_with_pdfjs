@@ -40,6 +40,7 @@ from anki.utils import (
 from .anki_version_detection import anki_point_version
 from .config import gc
 
+import aqt
 from aqt import mw
 from aqt.qt import *
 from aqt.theme import theme_manager
@@ -51,6 +52,7 @@ from aqt.utils import (
 )
 from aqt.previewer import Previewer
 from aqt.reviewer import Reviewer
+from aqt.webview import AnkiWebPage
 import aqt.mediasrv as mediasrv
 
 from .copied.helpers import check_string_for_existing_file
@@ -62,10 +64,108 @@ addondir = os.path.join(addon_path)
 regex = r"(web[/\\].*)"
 mw.addonManager.setWebExports(__name__, regex)
 web_path = "/_addons/%s/web/" % addonfoldername
+       
+
+def search_in_browser(file_name, page):
+    # file_name already has .pdf extension
+    text = f"""{gc("inline_prefix")}{file_name[:-4]}{gc("inline_separator")}{page} OR {gc("inline_prefix")}{file_name}{gc("inline_separator")}{page}"""
+    browser = aqt.dialogs.open("Browser", mw)
+    browser.form.searchEdit.lineEdit().setText(text)
+    browser.onSearchActivated()
+
+
+def new_add_window_referencing_this_page(file_name, page):  # unused
+    # TODO only useful if added to the right field for the right note type
+    # file_name already has .pdf extension
+    text = f"""{gc("inline_prefix")}{file_name[:-4]}{gc("inline_separator")}{page}"""
+    addcards = aqt.dialogs.open("AddCards", mw=aqt.mw)
+    addcards.editor.note["Front"] = text
+    addcards.editor.loadNoteKeepingFocus()
+
+
+
+class MyAnkiWebPage(AnkiWebPage):
+     def acceptNavigationRequest(self, url, navType, isMainFrame):
+        return super(AnkiWebPage, self).acceptNavigationRequest(url, navType, isMainFrame)
+
+
+class WebViewForPdfjs(QWebEngineView):
+    pycmd_page_in_browser = "pdfjs_page_in_browser____"
+    pycmd_page_to_clip = "pdfjs_page_to_clip____"
+
+    def __init__(self, parent=mw):
+        QWebEngineView.__init__(self, parent=parent)
+        self.parent = parent
+        self._page = MyAnkiWebPage(self._onBridgeCmd)
+        self.new_cb_text = ""
+        self.setPage(self._page)
+
+    def _onBridgeCmd(self, cmd: str):
+        print(f'in bridge_cmd: cmd is {cmd}')
+        ## in AnkiWebView._onBridgeCmd:
+        # handled, result = webview_did_receive_js_message(
+        #     (False, None), cmd, self._bridge_context
+        # )
+        # if handled:
+        #     return result
+        # else:
+        #     return self.onBridgeCmd(cmd)
+        if cmd.startswith(self.pycmd_page_in_browser):
+            page = cmd[len(self.pycmd_page_in_browser):]
+            search_in_browser(self.parent.fname, page)
+        elif cmd.startswith(self.pycmd_page_to_clip):  # run after afterCopyWithReference
+            page = cmd[len(self.pycmd_page_to_clip):]
+            self.second_afterCopyWithReference(page)
+        else:
+            print("unhandled bridge cmd:", cmd)    
+
+    def contextMenuEvent(self, evt: QContextMenuEvent) -> None:
+        m = QMenu(self)
+        a_copy = m.addAction("copy")
+        qconnect(a_copy.triggered, self.onCopy)
+        a_refcopy = m.addAction("copy, add reference")
+        qconnect(a_refcopy.triggered, self.onCopyWithReference)
+        a_reference = m.addAction("show notes referencing this page in browser")
+        qconnect(a_reference.triggered, self.show_notes_referencing_page)
+        m.popup(QCursor.pos())
+
+    def onCopy(self) -> None:
+        self.triggerPageAction(QWebEnginePage.WebAction.Copy)
+
+    def onCopyWithReference(self):
+        self.onCopy()
+        t = QTimer(self.parent)
+        t.timeout.connect(self.afterCopyWithReference)  # type: ignore
+        t.setSingleShot(True)
+        t.start(100)   
+
+    def afterCopyWithReference(self):
+        cb = mw.app.clipboard().mimeData()
+        if not cb.hasText():
+            tooltip("clipboard has not text. Aborting ...")
+            return
+        self.new_cb_text = cb.text()
+        js = """
+var cur_pdf_page = PDFViewerApplication.pdfViewer.currentPageNumber;
+pycmd(`%s${cur_pdf_page}`);
+""" % self.pycmd_page_to_clip
+        self.page().runJavaScript(js)
+
+    def second_afterCopyWithReference(self, page):
+        new_clip = f"""{self.new_cb_text}\n\n{gc("inline_prefix")}{self.parent.fname[:-4]}{gc("inline_separator")}{page}"""
+        mw.app.clipboard().setText(new_clip)
+        self.new_cb_text = ""
+
+    def show_notes_referencing_page(self):
+        js = """
+var cur_pdf_page = PDFViewerApplication.pdfViewer.currentPageNumber;
+pycmd(`%s${cur_pdf_page}`);
+""" % self.pycmd_page_in_browser
+        self.page().runJavaScript(js)
 
 
 class PdfJsViewer(QDialog):
-    def __init__(self, parent, url, win_title):
+    def __init__(self, parent, url, fname, win_title):
         super(PdfJsViewer, self).__init__(parent)
         if anki_point_version < 45:
             mw.setupDialogGC(self)
@@ -73,18 +173,18 @@ class PdfJsViewer(QDialog):
             mw.garbage_collect_on_dialog_finish(self)
         self.parent = parent
         self.url = url
+        self.fname = fname
         self.setWindowTitle(win_title)
         restoreGeom(self, "319501851")
         mainLayout = QVBoxLayout()
         mainLayout.setContentsMargins(0, 0, 0, 0)
         mainLayout.setSpacing(0)
         self.setLayout(mainLayout)
-        self.web = QWebEngineView()
+        self.web = WebViewForPdfjs(self)
         self.web.title = "pdfjs"
         mainLayout.addWidget(self.web)
         QMetaObject.connectSlotsByName(self)
         self.web.load(QUrl(self.url))
-        self.web.show()
         self.web.loadFinished.connect(self.load_finished)
         # self.web.setFocus()
         self.exit_shortcut = QShortcut(QKeySequence(Qt.Key.Key_Escape), self)
@@ -212,7 +312,7 @@ def open_pdf_in_internal_viewer__with_pdfjs(parent, file, page):
     win_title = 'Anki - pdf viewer'
     port = mw.mediaServer.getPort()
     url = f"http://127.0.0.1:{port}/_addons/{addonfoldername}/web/pdfjs_legacy/web/viewer.html{fmt}"
-    d = PdfJsViewer(parent, url, win_title)
+    d = PdfJsViewer(parent, url, file, win_title)
     d.show()
 
 
