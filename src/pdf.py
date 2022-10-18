@@ -244,12 +244,15 @@ class ChromiumPdfViewerWindow(QDialog):
         mainLayout.setSpacing(0)
         self.setLayout(mainLayout)
         self.setGeometry(0, 28, 1000, 750)
+        restoreGeom(self, "319501851chromium")
         self.webview = QWebEngineView()
         self.webview.settings().setAttribute(QWebEngineSettings.WebAttribute.PluginsEnabled, True)
         self.webview.settings().setAttribute(QWebEngineSettings.WebAttribute.PdfViewerEnabled, True)
         mainLayout.addWidget(self.webview)
         url_as_qurl = QUrl(url)
         self.webview.load(url_as_qurl)
+        self.exit_shortcut = QShortcut(QKeySequence(Qt.Key.Key_Escape), self)
+        self.exit_shortcut.activated.connect(self.reject)
 
         # "#page=" are ignored in pyqt5
         # https://stackoverflow.com/questions/60560583/open-pdf-at-specific-page-with-qt-webengineview
@@ -285,6 +288,14 @@ class ChromiumPdfViewerWindow(QDialog):
         t.setSingleShot(True)
         t.start(1000)   
         self.go_to_page()
+
+    def reject(self):
+        saveGeom(self, "319501851chromium")
+        QDialog.reject(self)
+
+    def closeEvent(self, evnt):
+        saveGeom(self, "319501851chromium")
+
 
 
 handledfile = None
