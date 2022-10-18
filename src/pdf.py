@@ -225,7 +225,7 @@ PDFViewerApplication._forceCssTheme();
                 t = QTimer(self.parent)
                 t.timeout.connect(self.toggle_to_dark_inverted)  # type: ignore
                 t.setSingleShot(True)
-                t.start(1000)   
+                t.start(gc("night mode adjustment delay in ms", 1000))   
 
         else:
             tooltip('page failed to load')

@@ -7,6 +7,7 @@
     "insert into editor: surrounded by default": true,
     "field_for_filename": "external_source",
     "field_for_page": "external_page",
+    "night mode adjustment delay in ms": 1000,
     "pdf_folder_paths": "",
     "open pdfs from other paths than the default path":  false,
     "show_first_run_message": true,

@@ -1,5 +1,7 @@
 see the description on https://ankiweb.net/shared/info/319501851.
 
+If in night mode your pdf is not inverted and a light theme is used increase the value for `"night mode adjustment delay in ms"`. 
+
 For shortcuts in the pdf viewer see: https://github.com/mozilla/pdf.js/wiki/Frequently-Asked-Questions#what-are-the-pdfjs-keyboard-shortcuts
 
 This add-on includes a hack so that in pdfjs the colors of the pdf and the surrounding toolbar can be inverted (night mode). This has multiple flaws but I still use it because I really dislike looking at a bright white pdf at night. You can disable it by setting  `"apply night mode hacks to invert colors by default"` to `false`.
