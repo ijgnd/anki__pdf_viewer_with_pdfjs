@@ -8,6 +8,8 @@ This add-on includes a hack so that in pdfjs the colors of the pdf and the surro
 
 The underlying toolkit that Anki uses bundles a pdf viewer since around Anki 2.1.35 (well after the first version of my add-on was released). The problem with this bundled pdf viewer is that - unless you are on the latest anki builds with pyqt6 - a pdf is always opened on page 1. In this viewer there's also no night mode support. It's faster though. If you want to use it change the setting `"use pdfjs to show pdfs in Anki 2.1.50+ (with pyqt6)"` to `false`.
 
+`"dialog move besides current window"` can be `"left"` or `"right"` or `false`. If it's `"left"` or `"right"` the add-on tries to move the pdf window to the side so that the pdf window does not cover the source window.
+
 &nbsp;
 &nbsp;
 &nbsp;

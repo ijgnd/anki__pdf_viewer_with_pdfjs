@@ -1,5 +1,6 @@
 {
     "apply night mode hacks to invert colors by default": true,
+    "dialog move besides current window": "left",
     "inline modification enabled": true,
     "inline_prefix": "___",
     "inline_separator": "____",

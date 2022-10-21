@@ -60,6 +60,7 @@ from aqt.webview import AnkiWebPage
 import aqt.mediasrv as mediasrv
 
 from .copied.helpers import check_string_for_existing_file
+from .window_move import move_window
 
 
 addon_path = os.path.dirname(__file__)
@@ -334,6 +335,14 @@ def parent_to_use(parent):
         return parent
 
 
+def maybe_move_dialog(d, parent):
+    pref = gc("dialog move besides current window")
+    if pref == "left":
+        move_window(left=d, right=parent, newpos="side-by-side")
+    elif pref == "right":
+        move_window(left=parent, right=d, newpos="side-by-side")
+
+
 def open_pdf_in_internal_viewer__with_pdfjs(parent, file, page):
     fmt = f"?file=/_pdfjspath/{file}#page={page}"
     win_title = 'Anki - pdf viewer'
@@ -344,6 +353,7 @@ def open_pdf_in_internal_viewer__with_pdfjs(parent, file, page):
         url = f"http://127.0.0.1:{port}/_addons/{addonfoldername}/web/pdfjs_legacy/web/viewer.html{fmt}"
     d = PdfJsViewer(parent_to_use(parent), url, file, win_title)
     d.show()
+    maybe_move_dialog(d, parent)
 
 
 def open_pdf_in_internal_viewer__with_chromium_pdf(parent, file, page):
@@ -354,6 +364,7 @@ def open_pdf_in_internal_viewer__with_chromium_pdf(parent, file, page):
     # parent=None means the window is closed immediately (in contrast to the pdfjs dialog)
     d = ChromiumPdfViewerWindow(parent, url, win_title)
     d.show()
+    maybe_move_dialog(d, parent)
 
 
 def open_pdf_in_internal_viewer_helper(parent, file, page, not_exist_warning=None):
