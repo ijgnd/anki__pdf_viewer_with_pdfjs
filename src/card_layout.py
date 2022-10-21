@@ -60,7 +60,7 @@ def on_ext_docs_link(self):
     t += """
 {{#SOURCE_FIELD_NAME}}
 <br><br><br>
-<a onclick="send_pdf_info_back(); return false" href="#">LINKTEXT</a>
+<a class="pdfjsaddon_twofields" onclick="send_pdf_info_back(); return false" href="#">LINKTEXT</a>
 <script src="_js_base64_minified_for_pdf_viewer_addon.js"></script>
 <script>
 function send_pdf_info_back(){

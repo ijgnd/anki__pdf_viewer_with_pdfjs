@@ -68,7 +68,7 @@ def ReviewerContextMenu(view, menu):
 def my_replace(match):
     match = match.group()
     encoded = base64.urlsafe_b64encode(match.encode('utf-8')).decode("utf-8")
-    return f"""<a href='javascript:pycmd("{pycmd_string}{encoded}");'>{match}</a>"""
+    return f"""<a class="pdfjsaddon_inline" href='javascript:pycmd("{pycmd_string}{encoded}");'>{match}</a>"""
 
 
 def actually_transform(txt):
