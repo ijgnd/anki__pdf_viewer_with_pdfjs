@@ -10,6 +10,7 @@
     "night mode adjustment delay in ms": 100,
     "pdf_folder_paths": "",
     "open pdfs from other paths than the default path":  false,
+    "reviewer shortcut open pdf": "w",
     "set no parent for pdfjs dialog": false,
     "show_first_run_message": true,
     "update_messages_shown": [],

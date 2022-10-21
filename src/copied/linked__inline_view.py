@@ -1,7 +1,7 @@
 import base64
 import re
 
-from anki.hooks import wrap
+from anki.hooks import addHook, wrap
 from aqt import gui_hooks
 from aqt import mw
 from aqt.browser import Browser
@@ -16,6 +16,8 @@ from .helpers import check_string_for_existing_file
 from .linked__inline_link_handler import process_urlcmd
 from .open_in_external import open_external
 
+pdf_refs_on_card = None
+current_cid = None
 
 
 def myLinkHandler_reviewer(self, url, _old):
@@ -24,6 +26,7 @@ def myLinkHandler_reviewer(self, url, _old):
     else:
         return _old(self, url)
 Reviewer._linkHandler = wrap(Reviewer._linkHandler, myLinkHandler_reviewer, "around")
+
 
 def myLinkHandler_previewer(self, url, _old):
     if process_urlcmd(self, url):
@@ -65,16 +68,56 @@ def ReviewerContextMenu(view, menu):
     contexthelper(menu, mw, selectedtext)
 
 
+def reviewer_shortcut_to_open_linked():
+    if not mw.reviewer.card.id == current_cid:
+        return
+    if not pdf_refs_on_card:
+        return
+    file, page = check_string_for_existing_file(pdf_refs_on_card[0])
+    if file:
+        open_external(mw, file, page)
+    else:
+        tooltip("maybe the file doesn't exist. Maybe there's a bug in the add-on 'pdf viewer ...'") 
+
+
+def add_reviewer_shortcut(shortcuts):
+    a = gc("reviewer shortcut open pdf")
+    if a:
+        shortcuts.append((a, reviewer_shortcut_to_open_linked))
+addHook("reviewStateShortcuts", add_reviewer_shortcut)
+
+
 def my_replace(match):
     match = match.group()
     encoded = base64.urlsafe_b64encode(match.encode('utf-8')).decode("utf-8")
     return f"""<a class="pdfjsaddon_inline" href='javascript:pycmd("{pycmd_string}{encoded}");'>{match}</a>"""
 
 
-def actually_transform(txt):
+def actually_transform(text, card, kind):
+    global current_cid
+    global pdf_refs_on_card
     pattern = r"(%s.*?%s\d{0,4})" % (gc("inline_prefix", "___"), gc("inline_separator", "____"))
-    txt = re.sub(pattern, my_replace, txt)
-    return txt
+    out = re.sub(pattern, my_replace, text)
+
+    # store pdf links for shortcut
+    current_cid = card.id
+    pdf_refs_on_card = []
+    # links from ___source____page (inline)
+    pdf_refs_on_card.extend(re.findall(pattern, text))
+    # links from fields external_source and external_page
+    # I use
+    #   var pdf_viewer_helper__encoded = Base64.encode("{{text:SOURCE_FIELD_NAME}}");
+    #   var merged_pdf_addon = `pdfjs319501851${pdf_viewer_helper__encoded}319501851{{text:PAGE_FIELD_NAME}}`;
+    #   pycmd(merged_pdf_addon);
+    pattern_file_name = r"""pdf_viewer_helper__encoded = Base64.encode\("(.*?)"\);"""
+    result = re.search(pattern_file_name, text)
+    filename = result.group(1) if result else None
+    pattern_page = r"""pdfjs319501851\$\{pdf_viewer_helper__encoded\}319501851(\d{1,4})`;"""
+    result = re.search(pattern_page, text)
+    page = result.group(1) if result else ""
+    if filename:
+        pdf_refs_on_card.append(f"""{gc("inline_prefix")}{filename}{gc("inline_separator")}{page}""")
+    return out
 
 
 def transform(text, card, kind):
@@ -86,7 +129,7 @@ def transform(text, card, kind):
         "clayoutQuestion",
         "clayoutAnswer",
     ]:
-        return actually_transform(text)
+        return actually_transform(text, card, kind)
     else:
         return text
 
