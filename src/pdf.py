@@ -53,11 +53,14 @@ from aqt.utils import (
     saveGeom,
     showInfo,
     tooltip,
+    askUser,
 )
 from aqt.previewer import Previewer
 from aqt.reviewer import Reviewer
 from aqt.webview import AnkiWebPage
 import aqt.mediasrv as mediasrv
+from aqt.mediasrv import app as flask_app
+from flask import Response
 
 from .copied.helpers import check_string_for_existing_file
 from .window_move import move_window
@@ -97,6 +100,7 @@ class MyAnkiWebPage(AnkiWebPage):
 class WebViewForPdfjs(QWebEngineView):
     pycmd_page_in_browser = "pdfjs_page_in_browser____"
     pycmd_page_to_clip = "pdfjs_page_to_clip____"
+    pycmd_doc_modified = "pdfjs_doc_modified"
 
     def __init__(self, parent=mw):
         QWebEngineView.__init__(self, parent=parent)
@@ -105,6 +109,45 @@ class WebViewForPdfjs(QWebEngineView):
         self._page.setBackgroundColor(QColor("#2f2f31") if anki_point_version <= 54 else theme_manager.qcolor(colors.CANVAS))
         self.new_cb_text = ""
         self.setPage(self._page)
+        self.doc_modified = False
+        self._inject_on_loaded_script()
+
+    def _inject_on_loaded_script(self):
+        script = QWebEngineScript()
+        script.setSourceCode("""
+        document.addEventListener("webviewerloaded", () => {
+            // setting disablePreferences is required to prevent preferences from overriding annotationEditorMode
+            // TODO: investigate how this affects theming and other things
+            // TODO: if those preferences are coming from localStorage as I can tell from reading pdf.js's source,
+            // investigate enabling the editor by directly setting the "pdfjs.preferences" local storage key
+            PDFViewerApplicationOptions.set("disablePreferences", true);
+            // TODO: maybe set viewerCssTheme according to Anki's theme
+            //PDFViewerApplicationOptions.set("viewerCssTheme", 0);
+            PDFViewerApplicationOptions.set("annotationEditorMode", pdfjsLib.AnnotationEditorType.NONE);
+            PDFViewerApplication.initializedPromise.then(() => {
+                PDFViewerApplication.eventBus.on("documentloaded", function () {
+                    const oldOnSetModified = PDFViewerApplication.pdfViewer.pdfDocument.annotationStorage.onSetModified;
+                    PDFViewerApplication.pdfViewer.pdfDocument.annotationStorage.onSetModified = () => {
+                        if(oldOnSetModified) oldOnSetModified;
+                        pycmd('%s');
+                    };
+                });
+            });
+        });
+        """ % self.pycmd_doc_modified)
+
+        script.setInjectionPoint(QWebEngineScript.InjectionPoint.DocumentCreation)
+        script.setWorldId(QWebEngineScript.ScriptWorldId.MainWorld)
+        self.page().scripts().insert(script)
+        pdf_folder_path = gc("pdf_folder_paths", "")
+        if pdf_folder_path:
+            self.page().profile().setDownloadPath(pdf_folder_path)
+            self.page().profile().downloadRequested.connect(self.on_download)
+
+    def on_download(self, download):
+        # Overwrite existing file
+        download.setDownloadFileName(download.suggestedFileName())
+        download.accept()
 
     def _onBridgeCmd(self, cmd: str):
         print(f'in bridge_cmd: cmd is {cmd}')
@@ -122,6 +165,8 @@ class WebViewForPdfjs(QWebEngineView):
         elif cmd.startswith(self.pycmd_page_to_clip):  # run after afterCopyWithReference
             page = cmd[len(self.pycmd_page_to_clip):]
             self.second_afterCopyWithReference(page)
+        elif cmd.startswith(self.pycmd_doc_modified):
+            self.doc_modified = True
         else:
             print("unhandled bridge cmd:", cmd)    
 
@@ -169,8 +214,6 @@ pycmd(`%s${cur_pdf_page}`);
 """ % self.pycmd_page_in_browser
         self.page().runJavaScript(js)
 
-
-
 class PdfJsViewer(QDialog):
     def __init__(self, parent, url, fname, win_title):
         super(PdfJsViewer, self).__init__(parent)
@@ -196,13 +239,14 @@ class PdfJsViewer(QDialog):
         self.web.loadFinished.connect(self.load_finished)
         # self.web.setFocus()
         self.exit_shortcut = QShortcut(QKeySequence(Qt.Key.Key_Escape), self)
-        self.exit_shortcut.activated.connect(self.reject)
-
-    def reject(self):
-        saveGeom(self, "319501851")
-        QDialog.reject(self)
+        self.exit_shortcut.activated.connect(self.close)
 
     def closeEvent(self, evnt):
+        if self.web.doc_modified:
+            ret = askUser("The document has unsaved changes. Do you want to save them?", self, defaultno=False)
+            if ret:
+                self.web.page().runJavaScript("PDFViewerApplication.save()")
+
         saveGeom(self, "319501851")
 
     def toggle_to_dark_inverted(self):
@@ -236,7 +280,6 @@ PDFViewerApplication._forceCssTheme();
                 t.timeout.connect(self.toggle_to_dark_inverted)  # type: ignore
                 t.setSingleShot(True)
                 t.start(gc("night mode adjustment delay in ms", 1000))   
-
         else:
             tooltip('page failed to load')
 
@@ -477,9 +520,17 @@ if anki_point_version >= 50:
         else:
             return _old(path)
 
+
     mediasrv._extract_addon_request = wrap(mediasrv._extract_addon_request,
                                                 _extract_pdf_request, 'around')
 
+@flask_app.after_request
+def disable_caching_for_pdf(response: Response) -> None:
+    # Disable caching for PDF so that modifications are reflected
+    # when reopening the file shortly after the modification
+    if response.mimetype == "application/pdf":
+        response.cache_control.max_age = 0
+    return response
 
 def my_helper(editor, menu):
     filefld = [f["ord"] for f in editor.note.model()['flds'] if f['name'] == gc("field_for_filename")]
