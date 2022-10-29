@@ -13,9 +13,14 @@ def gc(arg, fail=False):
 
 
 def wc(arg, val):
-    config = mw.addonManager.getConfig(__name__)
-    config[arg] = val
-    mw.addonManager.writeConfig(__name__, config)
+    try:
+        config = mw.addonManager.getConfig(__name__)
+    except:
+        return None
+    else:
+        if config:
+            config[arg] = val
+            mw.addonManager.writeConfig(__name__, config)
 
 
 addon_path = os.path.dirname(__file__)

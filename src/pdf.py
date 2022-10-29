@@ -106,7 +106,8 @@ class WebViewForPdfjs(QWebEngineView):
         QWebEngineView.__init__(self, parent=parent)
         self.parent = parent
         self._page = MyAnkiWebPage(self._onBridgeCmd)
-        self._page.setBackgroundColor(QColor("#2f2f31") if anki_point_version <= 54 else theme_manager.qcolor(colors.CANVAS))
+        if theme_manager.night_mode:
+            self._page.setBackgroundColor(QColor("#2f2f31") if anki_point_version <= 54 else theme_manager.qcolor(colors.CANVAS))
         self.new_cb_text = ""
         self.setPage(self._page)
         self.doc_modified = False
@@ -177,6 +178,57 @@ class WebViewForPdfjs(QWebEngineView):
         qconnect(a_refcopy.triggered, self.onCopyWithReference)
         a_reference = m.addAction("show notes referencing this page in browser")
         qconnect(a_reference.triggered, self.show_notes_referencing_page)
+
+        a = m.addAction("disable")
+        qconnect(a.triggered, self.disable_highlighter)
+
+        for d in gc("pdfjs_context_menu_entries"):
+            if isinstance(d, dict):
+                if d.get("type") == "line":
+                    color = d.get("color")
+                    thickness = d.get("thickness")
+                    opacity = d.get("opacity")
+                    if isinstance(thickness, str):
+                        try: 
+                            thickness = int(thickness)
+                        except:
+                            tooltip("error in pdf viewer add-on config")
+                            continue
+                    if isinstance(opacity, str):
+                        try: 
+                            opacity = int(opacity)
+                        except:
+                            tooltip("error in pdf viewer add-on config")
+                            continue
+                    label = d.get("context menu entry")
+                    if not (isinstance(color, str) and isinstance(thickness, int) and isinstance(opacity, int) and isinstance(label, str)):
+                        tooltip("error in pdf viewer add-on config")
+                        continue
+                    a = m.addAction(label)
+                    qconnect(a.triggered, lambda _, c=color, t=thickness, o=opacity: self.draw_line(c, t, o))
+                
+                if d.get("type") == "freetext":
+                    color = d.get("color")
+                    size = d.get("size")
+                    opacity = d.get("opacity")
+                    if isinstance(size, str):
+                        try: 
+                            size = int(size)
+                        except:
+                            tooltip("error in pdf viewer add-on config")
+                            continue
+                    if isinstance(opacity, str):
+                        try: 
+                            opacity = int(opacity)
+                        except:
+                            tooltip("error in pdf viewer add-on config")
+                            continue
+                    label = d.get("context menu entry")
+                    if not (isinstance(color, str) and isinstance(size, int) and isinstance(opacity, int) and isinstance(label, str)):
+                        tooltip("error in pdf viewer add-on config")
+                        continue
+                    a = m.addAction(label)
+                    qconnect(a.triggered, lambda _, c=color, s=size, o=opacity: self.add_freetext(c, s, o))
         m.popup(QCursor.pos())
 
     def onCopy(self) -> None:
@@ -212,6 +264,58 @@ var cur_pdf_page = PDFViewerApplication.pdfViewer.currentPageNumber;
 pycmd(`%s${cur_pdf_page}`);
 """ % self.pycmd_page_in_browser
         self.page().runJavaScript(js)
+
+    def disable_highlighter(self):
+        js = """
+PDFViewerApplication.pdfViewer.annotationEditorMode = pdfjsLib.AnnotationEditorType.NONE;
+        """
+        self.page().runJavaScript(js)   
+
+    def actually_draw_line(self, color, thickness, opacity):
+        js = """
+PDFViewerApplication.pdfViewer.annotationEditorMode = pdfjsLib.AnnotationEditorType.INK;
+PDFViewerApplication.pdfViewer.annotationEditorParams = {
+    type: pdfjsLib.AnnotationEditorParamsType.INK_COLOR, value: '%s'
+}
+PDFViewerApplication.pdfViewer.annotationEditorParams = {
+    type: pdfjsLib.AnnotationEditorParamsType.INK_THICKNESS, value: %d
+}
+PDFViewerApplication.pdfViewer.annotationEditorParams = {
+    type: pdfjsLib.AnnotationEditorParamsType.INK_OPACITY, value: %d
+}
+        """ % (color, thickness, opacity)
+        self.page().runJavaScript(js)
+
+    def draw_line(self, color, thickness, opacity):
+        self.disable_highlighter()
+        t = QTimer(mw)
+        t.timeout.connect(lambda c=color, t=thickness, o=opacity: self.actually_draw_line(c, t, o))  # type: ignore
+        t.setSingleShot(True)
+        t.start(gc("pdfjs highlighter switch delay", 300))
+
+    def actually_add_freetext(self, color, size, opacity):
+        js = """
+PDFViewerApplication.pdfViewer.annotationEditorMode = pdfjsLib.AnnotationEditorType.FREETEXT;
+PDFViewerApplication.pdfViewer.annotationEditorParams = {
+    type: pdfjsLib.AnnotationEditorParamsType.FREETEXT_COLOR, value: '%s'
+}
+PDFViewerApplication.pdfViewer.annotationEditorParams = {
+    type: pdfjsLib.AnnotationEditorParamsType.FREETEXT_SIZE, value: %d
+}
+PDFViewerApplication.pdfViewer.annotationEditorParams = {
+    type: pdfjsLib.AnnotationEditorParamsType.FREETEXT_OPACITY, value: %d
+}
+        """ % (color, size, opacity)
+        print('.....................')
+        print(js)
+        self.page().runJavaScript(js)
+
+    def add_freetext(self, color, size, opacity):
+        self.disable_highlighter()
+        t = QTimer(mw)
+        t.timeout.connect(lambda c=color, s=size, o=opacity: self.actually_add_freetext(c, s, o))  # type: ignore
+        t.setSingleShot(True)
+        t.start(gc("pdfjs highlighter switch delay", 300))
 
 class PdfJsViewer(QDialog):
     def __init__(self, parent, url, fname, win_title):

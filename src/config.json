@@ -9,8 +9,51 @@
     "field_for_filename": "external_source",
     "field_for_page": "external_page",
     "night mode adjustment delay in ms": 100,
-    "pdf_folder_paths": "",
     "open pdfs from other paths than the default path":  false,
+    "pdf_folder_paths": "",
+    "pdfjs highlighter switch delay": 300,
+    "pdfjs_context_menu_entries": [
+        {
+            "type": "line",
+            "color": "#ff0000",
+            "context menu entry": "line - red",
+            "thickness": 5,
+            "opacity": 100,
+            "shortcut": "Ctrl+R"
+        },
+        {
+            "type": "line",
+            "color": "#55ff00",
+            "context menu entry": "line - green",
+            "thickness": 5,
+            "opacity": 100,
+            "shortcut": "Ctrl+G"
+        },
+        {
+            "type": "line",
+            "color": "#ffff00",
+            "context menu entry": "yellow, semi transparent",
+            "thickness": 20,
+            "opacity": 20,
+            "shortcut": "Ctrl+F"
+        },
+        {
+            "type": "freetext",
+            "color": "#000000",
+            "context menu entry": "textbox - black - medium",
+            "size": 10,
+            "opacity": 100,
+            "shortcut": "Ctrl+J"
+        },
+        {
+            "type": "freetext",
+            "color": "#ff0000",
+            "context menu entry": "textbox - red - big",
+            "size": 25,
+            "opacity": 100,
+            "shortcut": "Ctrl+H"
+        }
+    ],
     "reviewer shortcut open pdf": "w",
     "set no parent for pdfjs dialog": false,
     "show_first_run_message": true,
