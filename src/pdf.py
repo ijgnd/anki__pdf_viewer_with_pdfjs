@@ -121,8 +121,7 @@ class WebViewForPdfjs(QWebEngineView):
             // TODO: if those preferences are coming from localStorage as I can tell from reading pdf.js's source,
             // investigate enabling the editor by directly setting the "pdfjs.preferences" local storage key
             PDFViewerApplicationOptions.set("disablePreferences", true);
-            // TODO: maybe set viewerCssTheme according to Anki's theme
-            //PDFViewerApplicationOptions.set("viewerCssTheme", 0);
+            PDFViewerApplicationOptions.set("viewerCssTheme", %d);
             PDFViewerApplicationOptions.set("annotationEditorMode", pdfjsLib.AnnotationEditorType.NONE);
             PDFViewerApplication.initializedPromise.then(() => {
                 PDFViewerApplication.eventBus.on("documentloaded", function () {
@@ -134,7 +133,7 @@ class WebViewForPdfjs(QWebEngineView):
                 });
             });
         });
-        """ % self.pycmd_doc_modified)
+        """ % (2 if theme_manager.night_mode else 1, self.pycmd_doc_modified))
 
         script.setInjectionPoint(QWebEngineScript.InjectionPoint.DocumentCreation)
         script.setWorldId(QWebEngineScript.ScriptWorldId.MainWorld)
