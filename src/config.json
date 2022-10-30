@@ -12,6 +12,7 @@
     "open pdfs from other paths than the default path":  false,
     "pdf_folder_paths": "",
     "pdfjs highlighter switch delay": 300,
+    "pdfjs_shortcut_switch_off_editing": "Ctrl+e",
     "pdfjs_context_menu_entries": [
         {
             "type": "line",

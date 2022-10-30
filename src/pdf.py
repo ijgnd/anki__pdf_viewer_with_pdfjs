@@ -112,7 +112,83 @@ class WebViewForPdfjs(QWebEngineView):
         self.setPage(self._page)
         self.doc_modified = False
         self._inject_on_loaded_script()
+        self.set_pdf_shortcuts()
 
+    def set_pdf_shortcuts(self):
+        self.action_dict = {}
+        self.shorcuts = []
+        abort = gc("pdfjs_shortcut_switch_off_editing")
+        if abort:
+            scut = QShortcut(QKeySequence(abort), self)
+            scut.activated.connect(self.disable_highlighter)
+            self.shorcuts.append(scut)
+        for d in gc("pdfjs_context_menu_entries"):
+            if isinstance(d, dict):
+                if d.get("type") == "line":
+                    color = d.get("color")
+                    thickness = d.get("thickness")
+                    opacity = d.get("opacity")
+                    shortcut = d.get("shortcut")
+                    if isinstance(thickness, str):
+                        try: 
+                            thickness = int(thickness)
+                        except:
+                            tooltip("error in pdf viewer add-on config")
+                            continue
+                    if isinstance(opacity, str):
+                        try: 
+                            opacity = int(opacity)
+                        except:
+                            tooltip("error in pdf viewer add-on config")
+                            continue
+                    label = d.get("context menu entry")
+                    if not (isinstance(color, str) and isinstance(thickness, int) and isinstance(opacity, int) and isinstance(label, str)):
+                        tooltip("error in pdf viewer add-on config")
+                        continue
+                    action = QAction(self)
+                    if shortcut:
+                        # pass
+                        action.setShortcut(QKeySequence(shortcut))  # doesn't work
+                        # label = f"{label} ({shortcut})" 
+                    action.setText(label)                        
+                    qconnect(action.triggered, lambda _, c=color, t=thickness, o=opacity: self.draw_line(c, t, o))
+                    self.action_dict[label] = action
+                    scut = QShortcut(QKeySequence(shortcut), self)
+                    scut.activated.connect(lambda c=color, t=thickness, o=opacity: self.draw_line(c, t, o))
+                    self.shorcuts.append(scut)
+                if d.get("type") == "freetext":
+                    color = d.get("color")
+                    size = d.get("size")
+                    opacity = d.get("opacity")
+                    shortcut = d.get("shortcut")
+                    if isinstance(size, str):
+                        try: 
+                            size = int(size)
+                        except:
+                            tooltip("error in pdf viewer add-on config")
+                            continue
+                    if isinstance(opacity, str):
+                        try: 
+                            opacity = int(opacity)
+                        except:
+                            tooltip("error in pdf viewer add-on config")
+                            continue
+                    label = d.get("context menu entry")
+                    if not (isinstance(color, str) and isinstance(size, int) and isinstance(opacity, int) and isinstance(label, str)):
+                        tooltip("error in pdf viewer add-on config")
+                        continue
+                    action = QAction(self)
+                    action.setText(label)
+                    if shortcut:
+                        # pass
+                        action.setShortcut(QKeySequence(shortcut))  # doesn't work
+                        # label = f"{label} ({shortcut})" 
+                    qconnect(action.triggered, lambda _, c=color, s=size, o=opacity: self.add_freetext(c, s, o))
+                    self.action_dict[label] = action
+                    scut = QShortcut(QKeySequence(shortcut), self)
+                    scut.activated.connect(lambda c=color, s=size, o=opacity: self.add_freetext(c, s, o))
+                    self.shorcuts.append(scut)
+                    
     def _inject_on_loaded_script(self):
         script = QWebEngineScript()
         script.setSourceCode("""
@@ -178,57 +254,11 @@ class WebViewForPdfjs(QWebEngineView):
         qconnect(a_refcopy.triggered, self.onCopyWithReference)
         a_reference = m.addAction("show notes referencing this page in browser")
         qconnect(a_reference.triggered, self.show_notes_referencing_page)
-
-        a = m.addAction("disable")
+        a = m.addAction("disable editor, text select")
         qconnect(a.triggered, self.disable_highlighter)
-
-        for d in gc("pdfjs_context_menu_entries"):
-            if isinstance(d, dict):
-                if d.get("type") == "line":
-                    color = d.get("color")
-                    thickness = d.get("thickness")
-                    opacity = d.get("opacity")
-                    if isinstance(thickness, str):
-                        try: 
-                            thickness = int(thickness)
-                        except:
-                            tooltip("error in pdf viewer add-on config")
-                            continue
-                    if isinstance(opacity, str):
-                        try: 
-                            opacity = int(opacity)
-                        except:
-                            tooltip("error in pdf viewer add-on config")
-                            continue
-                    label = d.get("context menu entry")
-                    if not (isinstance(color, str) and isinstance(thickness, int) and isinstance(opacity, int) and isinstance(label, str)):
-                        tooltip("error in pdf viewer add-on config")
-                        continue
-                    a = m.addAction(label)
-                    qconnect(a.triggered, lambda _, c=color, t=thickness, o=opacity: self.draw_line(c, t, o))
-                
-                if d.get("type") == "freetext":
-                    color = d.get("color")
-                    size = d.get("size")
-                    opacity = d.get("opacity")
-                    if isinstance(size, str):
-                        try: 
-                            size = int(size)
-                        except:
-                            tooltip("error in pdf viewer add-on config")
-                            continue
-                    if isinstance(opacity, str):
-                        try: 
-                            opacity = int(opacity)
-                        except:
-                            tooltip("error in pdf viewer add-on config")
-                            continue
-                    label = d.get("context menu entry")
-                    if not (isinstance(color, str) and isinstance(size, int) and isinstance(opacity, int) and isinstance(label, str)):
-                        tooltip("error in pdf viewer add-on config")
-                        continue
-                    a = m.addAction(label)
-                    qconnect(a.triggered, lambda _, c=color, s=size, o=opacity: self.add_freetext(c, s, o))
+        for label, action in self. action_dict.items():
+            m.addAction(action)
+       
         m.popup(QCursor.pos())
 
     def onCopy(self) -> None:
@@ -265,11 +295,21 @@ pycmd(`%s${cur_pdf_page}`);
 """ % self.pycmd_page_in_browser
         self.page().runJavaScript(js)
 
+    def enable_cursor(self):
+        js = """
+PDFViewerApplication.pdfCursorTools.switchTool(0);
+        """
+        self.page().runJavaScript(js)
+
     def disable_highlighter(self):
         js = """
 PDFViewerApplication.pdfViewer.annotationEditorMode = pdfjsLib.AnnotationEditorType.NONE;
         """
-        self.page().runJavaScript(js)   
+        self.page().runJavaScript(js)
+        t = QTimer(mw)
+        t.timeout.connect(self.enable_cursor)  # type: ignore
+        t.setSingleShot(True)
+        t.start(gc("pdfjs highlighter switch delay", 300))
 
     def actually_draw_line(self, color, thickness, opacity):
         js = """
@@ -306,8 +346,6 @@ PDFViewerApplication.pdfViewer.annotationEditorParams = {
     type: pdfjsLib.AnnotationEditorParamsType.FREETEXT_OPACITY, value: %d
 }
         """ % (color, size, opacity)
-        print('.....................')
-        print(js)
         self.page().runJavaScript(js)
 
     def add_freetext(self, color, size, opacity):
@@ -316,6 +354,9 @@ PDFViewerApplication.pdfViewer.annotationEditorParams = {
         t.timeout.connect(lambda c=color, s=size, o=opacity: self.actually_add_freetext(c, s, o))  # type: ignore
         t.setSingleShot(True)
         t.start(gc("pdfjs highlighter switch delay", 300))
+
+
+
 
 class PdfJsViewer(QDialog):
     def __init__(self, parent, url, fname, win_title):
@@ -385,6 +426,10 @@ PDFViewerApplication._forceCssTheme();
                 t.start(gc("night mode adjustment delay in ms", 1000))   
         else:
             tooltip('page failed to load')
+
+
+
+
 
 
 class ChromiumPdfViewerWindow(QDialog):
