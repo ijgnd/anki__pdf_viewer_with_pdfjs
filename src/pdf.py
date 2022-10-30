@@ -194,9 +194,6 @@ class WebViewForPdfjs(QWebEngineView):
         script.setSourceCode("""
         document.addEventListener("webviewerloaded", () => {
             // setting disablePreferences is required to prevent preferences from overriding annotationEditorMode
-            // TODO: investigate how this affects theming and other things
-            // TODO: if those preferences are coming from localStorage as I can tell from reading pdf.js's source,
-            // investigate enabling the editor by directly setting the "pdfjs.preferences" local storage key
             PDFViewerApplicationOptions.set("disablePreferences", true);
             PDFViewerApplicationOptions.set("viewerCssTheme", %d);
             PDFViewerApplicationOptions.set("annotationEditorMode", pdfjsLib.AnnotationEditorType.NONE);
